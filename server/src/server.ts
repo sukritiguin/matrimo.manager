@@ -4,8 +4,16 @@ import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import fastifyJWT from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
+import fastifyOAuth2 from "@fastify/oauth2";
 import prismaPlugin from "./plugins/prisma";
 import userRoutes from "./routes/users";
+import authRoutes from "./routes/auth";
+
+declare module "fastify" {
+  interface FastifyInstance {
+    googleOAuth2: any;
+  }
+}
 
 export const fastify = Fastify({
   logger: true,
@@ -52,7 +60,23 @@ fastify.register(fastifyCookie, {
   secret: "your-cookie-secret", // Use a strong secret key
 });
 
+// Register OAuth2 Plugin
+fastify.register(fastifyOAuth2 as any, {
+  name: "googleOAuth2",
+  scope: ["email", "profile"],
+  credentials: {
+    client: {
+      id: process.env.GOOGLE_OAUTH_CLIENT_ID!,
+      secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET!,
+    },
+    auth: fastifyOAuth2.GOOGLE_CONFIGURATION,
+  },
+  startRedirectPath: "/login/google",
+  callbackUri: "http://localhost:3000/login/google/callback",
+});
+
 fastify.register(userRoutes, { prefix: "/api" });
+fastify.register(authRoutes);
 
 fastify.get("/", async (request, reply) => {
   return {
