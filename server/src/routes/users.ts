@@ -1,37 +1,96 @@
 import { FastifyInstance } from "fastify";
 
 export default async function userRoutes(fastify: FastifyInstance) {
-  console.log("🔍 Fastify Plugins:", fastify); // Debugging log
-
-  fastify.get("/users", async (request, reply) => {
-    console.log("🔍 fastify.prisma:", fastify.prisma); // Debugging log
-    if (!fastify.prisma) {
-      reply.status(500).send({ error: "Prisma plugin not registered!" });
-      return;
-    }
-    const users = await fastify.prisma.user.findMany();
-    return users;
-  });
-
-  fastify.post(
+  // GET /users - Fetch all users
+  fastify.get(
     "/users",
     {
       schema: {
-        body: {
-          type: "object",
-          required: ["email"],
-          properties: {
-            email: { type: "string", format: "email" },
-            password: { type: "string", format: "password" },
+        description: "Get a list of all users",
+        tags: ["Users"],
+        response: {
+          200: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "number" },
+                email: { type: "string" },
+                password: { type: "string" },
+                verified: { type: "boolean" },
+                googleId: { type: "string" },
+                otp: { type: "string" },
+                createdAt: { type: "string" },
+                updatedAt: { type: "string" },
+              },
+            },
+          },
+          500: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
           },
         },
       },
     },
     async (request, reply) => {
-      console.log("🔍 fastify.prisma:", fastify.prisma); // Debugging log
       if (!fastify.prisma) {
-        reply.status(500).send({ error: "Prisma plugin not registered!" });
-        return;
+        return reply.internalServerError("Prisma plugin not registered!");
+      }
+
+      try {
+        const users = await fastify.prisma.user.findMany();
+        return users;
+      } catch (error) {
+        console.error("Database Error:", error);
+        return reply.internalServerError("Failed to fetch users");
+      }
+    }
+  );
+
+  // POST /users - Create a new user
+  fastify.post(
+    "/users",
+    {
+      schema: {
+        description: "Create a new user",
+        tags: ["Users"],
+        body: {
+          type: "object",
+          required: ["email", "password"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", format: "password" },
+          },
+        },
+        response: {
+          201: {
+            type: "object",
+            properties: {
+              id: { type: "number" },
+              email: { type: "string" },
+              password: { type: "string" },
+            },
+          },
+          400: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+          500: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      if (!fastify.prisma) {
+        return reply.internalServerError("Prisma plugin not registered!");
       }
 
       const { email, password } = request.body as {
@@ -43,10 +102,14 @@ export default async function userRoutes(fastify: FastifyInstance) {
         const user = await fastify.prisma.user.create({
           data: { email, password },
         });
-        return user;
+        return reply.code(201).send(user);
       } catch (error) {
         console.error("Database Error:", error);
-        reply.status(500).send({ error: "Internal Server Error" });
+
+        // Handle unique constraint violation (e.g., duplicate email)
+        // Need to write logic here................................................................
+
+        return reply.internalServerError("Failed to create user");
       }
     }
   );
