@@ -1,5 +1,7 @@
 // src/routes/authRoutes.ts
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import otpGenerator from "otp-generator";
+import { sendOTPEmail } from "../services/email.services";
 
 export default async function authRoutes(fastify: FastifyInstance) {
   // Callback route for Google OAuth
@@ -45,8 +47,71 @@ export default async function authRoutes(fastify: FastifyInstance) {
   });
 
   // Route for Google OAuth login initiation
-  // fastify.get("/login/google", async (req, reply) => {
-  //   // Redirect the user to Google's OAuth consent screen
-  //   reply.redirect(fastify.googleOAuth2.generateAuthorizationUri(req));
-  // });
+  fastify.post(
+    "/login/otp",
+    async (
+      req: FastifyRequest<{ Body: { email: string } }>,
+      reply: FastifyReply
+    ) => {
+      const { email } = req.body;
+
+      // Generate OTP
+      const otp = otpGenerator.generate(6, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+
+      // Save OTP in database
+      const existingUser = await fastify.prisma.user.findUnique({
+        where: { email: email },
+      });
+      if (existingUser) {
+        await fastify.prisma.user.update({
+          where: { email },
+          data: { otp, otpExpiry: new Date(Date.now() + 10 * 60 * 1000) }, // OTP valid for 10 minutes
+        });
+      } else {
+        await fastify.prisma.user.create({
+          data: {
+            email: email,
+            otp: otp,
+            otpExpiry: new Date(Date.now() + 10 * 60 * 1000),
+          },
+        });
+      }
+
+      // Send OTP via email or SMS
+      await sendOTPEmail(email, otp);
+
+      reply.send({ message: "OTP sent to your email." });
+    }
+  );
+
+  fastify.post(
+    "/login/otp/verify",
+    async (
+      req: FastifyRequest<{ Body: { email: string; otp: string } }>,
+      reply: FastifyReply
+    ) => {
+      const { email, otp } = req.body;
+
+      const user = await fastify.prisma.user.findUnique({ where: { email } });
+
+      
+
+      if (!user || user.otp !== otp || new Date() > user.otpExpiry!) {
+        reply.status(400).send({ message: "Invalid or expired OTP." });
+        return;
+      }
+
+      // Generate JWT
+      const jwt = fastify.jwt.sign({ userId: user.id });
+
+      // Set JWT in cookie
+      reply.setCookie("token", jwt, { httpOnly: true, path: "/" });
+      reply.send({ message: "Logged in successfully." });
+    }
+  );
 }

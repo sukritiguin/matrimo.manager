@@ -30,4 +30,19 @@ async function sendVerificationEmail(email: string) {
   }
 }
 
-export { sendVerificationEmail };
+async function sendOTPEmail(email: string, otp: string) {
+  const mailOptions = {
+    from: process.env.GOOGLE_EMAIL_APP_SENDER_EMAIL,
+    to: email,
+    subject: "Verify Your Email",
+    text: `Your OTP to log is: ${otp}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.log("Error sending email", error);
+  }
+}
+
+export { sendVerificationEmail, sendOTPEmail };
