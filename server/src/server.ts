@@ -2,10 +2,12 @@ import Fastify from "fastify";
 import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
+import fastifyJWT from "@fastify/jwt";
+import fastifyCookie from "@fastify/cookie";
 import prismaPlugin from "./plugins/prisma";
 import userRoutes from "./routes/users";
 
-const fastify = Fastify({
+export const fastify = Fastify({
   logger: true,
 });
 
@@ -34,6 +36,20 @@ fastify.register(swaggerUI, {
     docExpansion: "none",
     deepLinking: false,
   },
+});
+
+// JWT setup
+fastify.register(fastifyJWT, {
+  secret: "your-secret-key", // Use a strong secret key
+  cookie: {
+    cookieName: "token",
+    signed: false,
+  },
+});
+
+// Cookie setup
+fastify.register(fastifyCookie, {
+  secret: "your-cookie-secret", // Use a strong secret key
 });
 
 fastify.register(userRoutes, { prefix: "/api" });
