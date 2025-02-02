@@ -13,26 +13,41 @@ export default async function userRoutes(fastify: FastifyInstance) {
     return users;
   });
 
-  fastify.post("/users", async (request, reply) => {
-    console.log("🔍 fastify.prisma:", fastify.prisma); // Debugging log
-    if (!fastify.prisma) {
-      reply.status(500).send({ error: "Prisma plugin not registered!" });
-      return;
-    }
+  fastify.post(
+    "/users",
+    {
+      schema: {
+        body: {
+          type: "object",
+          required: ["email"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", format: "password" },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      console.log("🔍 fastify.prisma:", fastify.prisma); // Debugging log
+      if (!fastify.prisma) {
+        reply.status(500).send({ error: "Prisma plugin not registered!" });
+        return;
+      }
 
-    const { email, password } = request.body as {
-      email: string;
-      password: string;
-    };
+      const { email, password } = request.body as {
+        email: string;
+        password: string;
+      };
 
-    try {
-      const user = await fastify.prisma.user.create({
-        data: { email, password },
-      });
-      return user;
-    } catch (error) {
-      console.error("Database Error:", error);
-      reply.status(500).send({ error: "Internal Server Error" });
+      try {
+        const user = await fastify.prisma.user.create({
+          data: { email, password },
+        });
+        return user;
+      } catch (error) {
+        console.error("Database Error:", error);
+        reply.status(500).send({ error: "Internal Server Error" });
+      }
     }
-  });
+  );
 }
