@@ -1,8 +1,13 @@
 import Fastify from 'fastify';
+import prismaPlugin from './plugins/prisma';
+import userRoutes from './routes/users';
 
 const fastify = Fastify({
   logger: true,
 });
+
+fastify.register(prismaPlugin);
+fastify.register(userRoutes, { prefix: '/api' });
 
 fastify.get('/', async (request, reply) => {
   return { message: 'Hello, Fastify with TypeScript! Write code with Sukriti.' };
