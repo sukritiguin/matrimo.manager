@@ -1,4 +1,4 @@
-import Fastify from "fastify";
+import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
@@ -12,6 +12,7 @@ import authRoutes from "./routes/auth";
 declare module "fastify" {
   interface FastifyInstance {
     googleOAuth2: any;
+    authenticate: (req: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 }
 
@@ -75,6 +76,17 @@ fastify.register(fastifyOAuth2 as any, {
   callbackUri: "http://localhost:3000/login/google/callback",
 });
 
+fastify.decorate(
+  "authenticate",
+  async (req: FastifyRequest, reply: FastifyReply) => {
+    try {
+      await req.jwtVerify(); // Verify JWT
+    } catch (err) {
+      reply.status(401).send({ message: "Unauthorized" });
+    }
+  }
+);
+
 fastify.register(userRoutes, { prefix: "/api" });
 fastify.register(authRoutes);
 
@@ -83,6 +95,15 @@ fastify.get("/", async (request, reply) => {
     message: "Hello, Fastify with TypeScript! Write code with Sukriti.",
   };
 });
+
+// Protected route example
+fastify.get(
+  "/protected",
+  { onRequest: [fastify.authenticate] },
+  async (req, reply) => {
+    reply.send({ message: "You are authenticated." });
+  }
+);
 
 const start = async () => {
   try {

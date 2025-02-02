@@ -99,8 +99,6 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
       const user = await fastify.prisma.user.findUnique({ where: { email } });
 
-      
-
       if (!user || user.otp !== otp || new Date() > user.otpExpiry!) {
         reply.status(400).send({ message: "Invalid or expired OTP." });
         return;
@@ -111,6 +109,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
       // Set JWT in cookie
       reply.setCookie("token", jwt, { httpOnly: true, path: "/" });
+      await fastify.prisma.user.update({
+        where: { email },
+        data: { verified: true },
+      });
       reply.send({ message: "Logged in successfully." });
     }
   );
