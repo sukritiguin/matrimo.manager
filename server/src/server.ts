@@ -87,7 +87,7 @@ fastify.decorate(
   }
 );
 
-fastify.register(userRoutes, { prefix: "/api" });
+fastify.register(userRoutes, { prefix: "/api/users" });
 fastify.register(authRoutes);
 
 fastify.get("/", async (request, reply) => {

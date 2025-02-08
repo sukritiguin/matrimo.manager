@@ -5,7 +5,7 @@ import { sendVerificationEmail } from "../services/email.services";
 export default async function userRoutes(fastify: FastifyInstance) {
   // GET /users - Fetch all users
   fastify.get(
-    "/users",
+    "/",
     {
       schema: {
         description: "Get a list of all users",
@@ -53,7 +53,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
 
   // POST /users - Create a new user
   fastify.post(
-    "/users",
+    "/",
     {
       schema: {
         description: "Create a new user",
@@ -217,10 +217,37 @@ export default async function userRoutes(fastify: FastifyInstance) {
           data: { verified: true },
         });
 
+        // Generate JWT Token for automatic login
+      const authToken = fastify.jwt.sign({ email }, { expiresIn: "7d" }); // Token valid for 7 days
+
+      // Set token in cookies (HTTP-Only, Secure)
+      reply.setCookie("token", authToken, {
+        httpOnly: true,
+        secure: true, // Set to `false` if testing locally without HTTPS
+        sameSite: "strict",
+        path: "/",
+      });
+
         return reply.send({ message: "Email verified successfully!" });
       } catch (error) {
         return reply.status(400).send({ message: "Invalid or expired token." });
       }
     }
   );
+
+  fastify.post(
+    "/logout",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      reply.clearCookie("token", {
+        path: "/",
+        httpOnly: true,
+        secure: true, // Set to false if testing locally without HTTPS
+        sameSite: "strict",
+      });
+
+      return reply.send({ message: "Logged out successfully!" });
+    }
+  );
 }
+
+

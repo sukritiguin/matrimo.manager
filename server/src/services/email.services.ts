@@ -20,7 +20,7 @@ async function sendVerificationEmail(email: string) {
     from: process.env.GOOGLE_EMAIL_APP_SENDER_EMAIL,
     to: email,
     subject: "Verify Your Email",
-    text: `Click the link to verify your email: ${process.env.BASE_URL}/verify?token=${verificationToken}&email=${email}`,
+    text: `Click the link to verify your email: ${process.env.BASE_URL}/api/users/verify?token=${verificationToken}&email=${email}`,
   };
 
   try {
