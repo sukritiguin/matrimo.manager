@@ -1,0 +1,23 @@
+enum FORWHOME{
+    GROOM
+    BRIDE
+}
+
+model MarriageEvent{
+    id Int @id @unique @default(autoincrement())
+    forWhome        FORWHOME
+    groomName      String
+    groomFatherName String
+    groomMotherName String
+    brideName      String
+    brideFatherName String
+    brideMotherName String
+    venueAddress   String
+    eventDate      DateTime
+    eventTime      String
+    venueMapRef    String
+    themeId        Int?
+    themeName String
+
+    event Event @relation(fields: [id], references: [eventId])
+}
