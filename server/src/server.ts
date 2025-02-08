@@ -8,6 +8,7 @@ import fastifyOAuth2 from "@fastify/oauth2";
 import prismaPlugin from "./plugins/prisma";
 import userRoutes from "./routes/user.router";
 import authRoutes from "./routes/auth.router";
+import testRoutes from "./routes/test.router";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -89,6 +90,7 @@ fastify.decorate(
 
 fastify.register(userRoutes, { prefix: "/api/users" });
 fastify.register(authRoutes);
+fastify.register(testRoutes, { prefix: "/api/test" });
 
 fastify.get("/", async (request, reply) => {
   return {
@@ -114,5 +116,7 @@ const start = async () => {
     process.exit(1);
   }
 };
+
+export default fastify;
 
 start();

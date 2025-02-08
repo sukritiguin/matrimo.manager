@@ -35,11 +35,16 @@ export default async function authRoutes(fastify: FastifyInstance) {
         });
       }
 
-      // Generate a JWT for the user
-      const jwt = fastify.jwt.sign({ userId: user.id });
+        // Generate JWT Token for automatic login
+        const authToken = fastify.jwt.sign({email: user.email }, { expiresIn: "7d" }); // Token valid for 7 days
 
-      // Set the JWT in a cookie or return it in the response
-      reply.setCookie("token", jwt, { httpOnly: true, path: "/" });
+        // Set token in cookies (HTTP-Only, Secure)
+        reply.setCookie("token", authToken, {
+          httpOnly: true,
+          secure: true, // Set to `false` if testing locally without HTTPS
+          sameSite: "strict",
+          path: "/",
+        });
       reply.send({ message: "Logged in with Google.", user });
     } catch (err) {
       reply.status(500).send({ message: "Google OAuth failed.", error: err });
@@ -73,16 +78,22 @@ export default async function authRoutes(fastify: FastifyInstance) {
           data: { otp, otpExpiry: new Date(Date.now() + 10 * 60 * 1000) }, // OTP valid for 10 minutes
         });
       } else {
-        await fastify.prisma.user.create({
-          data: {
-            email: email,
-            otp: otp,
-            otpExpiry: new Date(Date.now() + 10 * 60 * 1000),
-          },
-        });
+
+        try {
+          await fastify.prisma.user.create({
+            data: {
+              email: email,
+              otp: otp,
+              otpExpiry: new Date(Date.now() + 10 * 60 * 1000),
+            },
+          });
+        } catch (error) {
+          console.log("Faced error while creating user with otp login", error);
+        }
       }
 
-      // Send OTP via email or SMS
+
+    // Send OTP via email or SMS
       await sendOTPEmail(email, otp);
 
       reply.send({ message: "OTP sent to your email." });
@@ -98,20 +109,22 @@ export default async function authRoutes(fastify: FastifyInstance) {
       const { email, otp } = req.body;
 
       const user = await fastify.prisma.user.findUnique({ where: { email } });
+      console.log("Verifying OTP for user:", user);
 
       if (!user || user.otp !== otp || new Date() > user.otpExpiry!) {
         reply.status(400).send({ message: "Invalid or expired OTP." });
         return;
       }
 
-      // Generate JWT
-      const jwt = fastify.jwt.sign({ userId: user.id });
+      // Generate JWT Token for automatic login
+      const authToken = fastify.jwt.sign({email: user.email }, { expiresIn: "7d" }); // Token valid for 7 days
 
-      // Set JWT in cookie
-      reply.setCookie("token", jwt, { httpOnly: true, path: "/" });
-      await fastify.prisma.user.update({
-        where: { email },
-        data: { verified: true },
+      // Set token in cookies (HTTP-Only, Secure)
+      reply.setCookie("token", authToken, {
+        httpOnly: true,
+        secure: true, // Set to `false` if testing locally without HTTPS
+        sameSite: "strict",
+        path: "/",
       });
       reply.send({ message: "Logged in successfully." });
     }
