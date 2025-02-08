@@ -4,63 +4,111 @@ import otpGenerator from "otp-generator";
 import { sendOTPEmail } from "../services/email.services";
 
 export default async function authRoutes(fastify: FastifyInstance) {
-  // Callback route for Google OAuth
-  fastify.get("/login/google/callback", async (req, reply) => {
-    try {
-      // Get the access token from the authorization code
-      const { token } =
-        await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(req);
-
-      // Fetch the user's profile information from Google
-      const userInfo = await fetch(
-        "https://www.googleapis.com/oauth2/v2/userinfo",
-        {
-          headers: { Authorization: `Bearer ${token.access_token}` },
-        }
-      ).then((res) => res.json());
-
-      // Check if the user already exists in the database
-      let user = await fastify.prisma.user.findUnique({
-        where: { email: userInfo.email },
-      });
-
-      // If the user doesn't exist, create a new user
-      if (!user) {
-        user = await fastify.prisma.user.create({
-          data: {
-            email: userInfo.email,
-            googleId: userInfo.id,
-            verified: true, // Mark as verified since it's from Google
+  
+  /**
+   * Google OAuth Callback
+   */
+  fastify.get(
+    "/login/google/callback",
+    {
+      schema: {
+        description: "Google OAuth callback to authenticate users",
+        tags: ["Auth"],
+        summary: "Google OAuth Callback",
+        response: {
+          200: {
+            description: "Successful authentication",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              user: {
+                type: "object",
+                properties: {
+                  email: { type: "string" },
+                  googleId: { type: "string" },
+                  verified: { type: "boolean" },
+                },
+              },
+            },
           },
-        });
-      }
+          500: {
+            description: "Google OAuth authentication failed",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              error: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (req: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { token } = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(req);
 
-        // Generate JWT Token for automatic login
-        const authToken = fastify.jwt.sign({email: user.email }, { expiresIn: "7d" }); // Token valid for 7 days
+        const userInfo = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+          headers: { Authorization: `Bearer ${token.access_token}` },
+        }).then((res) => res.json());
 
-        // Set token in cookies (HTTP-Only, Secure)
+        let user = await fastify.prisma.user.findUnique({ where: { email: userInfo.email } });
+
+        if (!user) {
+          user = await fastify.prisma.user.create({
+            data: {
+              email: userInfo.email,
+              googleId: userInfo.id,
+              verified: true,
+            },
+          });
+        }
+
+        const authToken = fastify.jwt.sign({ email: user.email }, { expiresIn: "7d" });
+
         reply.setCookie("token", authToken, {
           httpOnly: true,
-          secure: true, // Set to `false` if testing locally without HTTPS
+          secure: true,
           sameSite: "strict",
           path: "/",
         });
-      reply.send({ message: "Logged in with Google.", user });
-    } catch (err) {
-      reply.status(500).send({ message: "Google OAuth failed.", error: err });
-    }
-  });
 
-  // Route for Google OAuth login initiation
+        reply.send({ message: "Logged in with Google.", user });
+      } catch (err: any) {
+        reply.status(500).send({ message: "Google OAuth failed.", error: err.message });
+      }
+    }
+  );
+
+  /**
+   * Request OTP for Login
+   */
   fastify.post(
     "/login/otp",
-    async (
-      req: FastifyRequest<{ Body: { email: string } }>,
-      reply: FastifyReply
-    ) => {
+    {
+      schema: {
+        description: "Request an OTP for email login",
+        tags: ["Auth"],
+        summary: "Request OTP",
+        body: {
+          type: "object",
+          required: ["email"],
+          properties: {
+            email: { type: "string", format: "email" },
+          },
+        },
+        response: {
+          200: {
+            description: "OTP sent successfully",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (req: FastifyRequest<{ Body: { email: string } }>, reply: FastifyReply) => {
       const { email } = req.body;
 
-      // Generate OTP
       const otp = otpGenerator.generate(6, {
         digits: true,
         lowerCaseAlphabets: false,
@@ -68,64 +116,84 @@ export default async function authRoutes(fastify: FastifyInstance) {
         specialChars: false,
       });
 
-      // Save OTP in database
-      const existingUser = await fastify.prisma.user.findUnique({
-        where: { email: email },
-      });
+      const existingUser = await fastify.prisma.user.findUnique({ where: { email } });
+
       if (existingUser) {
         await fastify.prisma.user.update({
           where: { email },
-          data: { otp, otpExpiry: new Date(Date.now() + 10 * 60 * 1000) }, // OTP valid for 10 minutes
+          data: { otp, otpExpiry: new Date(Date.now() + 10 * 60 * 1000) },
         });
       } else {
-
-        try {
-          await fastify.prisma.user.create({
-            data: {
-              email: email,
-              otp: otp,
-              otpExpiry: new Date(Date.now() + 10 * 60 * 1000),
-            },
-          });
-        } catch (error) {
-          console.log("Faced error while creating user with otp login", error);
-        }
+        await fastify.prisma.user.create({
+          data: {
+            email,
+            otp,
+            otpExpiry: new Date(Date.now() + 10 * 60 * 1000),
+          },
+        });
       }
 
-
-    // Send OTP via email or SMS
       await sendOTPEmail(email, otp);
 
       reply.send({ message: "OTP sent to your email." });
     }
   );
 
+  /**
+   * Verify OTP for Login
+   */
   fastify.post(
     "/login/otp/verify",
-    async (
-      req: FastifyRequest<{ Body: { email: string; otp: string } }>,
-      reply: FastifyReply
-    ) => {
+    {
+      schema: {
+        description: "Verify OTP for login and authenticate user",
+        tags: ["Auth"],
+        summary: "Verify OTP",
+        body: {
+          type: "object",
+          required: ["email", "otp"],
+          properties: {
+            email: { type: "string", format: "email" },
+            otp: { type: "string", minLength: 6, maxLength: 6 },
+          },
+        },
+        response: {
+          200: {
+            description: "OTP verified successfully",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+          400: {
+            description: "Invalid or expired OTP",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (req: FastifyRequest<{ Body: { email: string; otp: string } }>, reply: FastifyReply) => {
       const { email, otp } = req.body;
 
       const user = await fastify.prisma.user.findUnique({ where: { email } });
-      console.log("Verifying OTP for user:", user);
 
       if (!user || user.otp !== otp || new Date() > user.otpExpiry!) {
         reply.status(400).send({ message: "Invalid or expired OTP." });
         return;
       }
 
-      // Generate JWT Token for automatic login
-      const authToken = fastify.jwt.sign({email: user.email }, { expiresIn: "7d" }); // Token valid for 7 days
+      const authToken = fastify.jwt.sign({ email: user.email }, { expiresIn: "7d" });
 
-      // Set token in cookies (HTTP-Only, Secure)
       reply.setCookie("token", authToken, {
         httpOnly: true,
-        secure: true, // Set to `false` if testing locally without HTTPS
+        secure: true,
         sameSite: "strict",
         path: "/",
       });
+
       reply.send({ message: "Logged in successfully." });
     }
   );

@@ -122,7 +122,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     {
       schema: {
         description: "Register a new user",
-        tags: ["Users"],
+        tags: ["Auth"],
         body: {
           type: "object",
           required: ["email", "password"],
@@ -187,38 +187,62 @@ export default async function userRoutes(fastify: FastifyInstance) {
     }
   );
 
-  // GET /verify - Verify the token send over email
-  fastify.get(
-    "/verify",
-    async (
-      req: FastifyRequest<{ Querystring: { token: string; email: string } }>,
-      reply: FastifyReply
-    ) => {
-      try {
-        const { token, email } = req.query as {
-          token: string;
-          email: string;
-        };
+  // GET /verify - Verify the token sent over email
+fastify.get(
+  "/verify",
+  {
+    schema: {
+      description: "Verify email using a token sent via email",
+      tags: ["Auth"],
+      summary: "Email Verification",
+      querystring: {
+        type: "object",
+        required: ["token", "email"],
+        properties: {
+          token: { type: "string", description: "JWT verification token" },
+          email: { type: "string", format: "email", description: "User email address" },
+        },
+      },
+      response: {
+        200: {
+          description: "Email verification successful",
+          type: "object",
+          properties: {
+            message: { type: "string" },
+          },
+        },
+        400: {
+          description: "Invalid or expired token",
+          type: "object",
+          properties: {
+            message: { type: "string" },
+          },
+        },
+      },
+    },
+  },
+  async (
+    req: FastifyRequest<{ Querystring: { token: string; email: string } }>,
+    reply: FastifyReply
+  ) => {
+    try {
+      const { token, email } = req.query as { token: string; email: string };
 
-        // Verify token
-        const decoded = fastify.jwt.verify(token) as {
-          email: string;
-        };
+      // Verify token
+      const decoded = fastify.jwt.verify(token) as { email: string };
 
-        if (decoded.email !== email) {
-          return reply
-            .status(400)
-            .send({ message: "Invalid verification link." });
-        }
+      if (decoded.email !== email) {
+        return reply.status(400).send({ message: "Invalid verification link." });
+      }
 
-        // Update user status in DB (mark as verified)
-        await fastify.prisma.user.update({
-          where: { email },
-          data: { verified: true },
-        });
+      // Update user status in DB (mark as verified)
+      await fastify.prisma.user.update({
+        where: { email },
+        data: { verified: true },
+      });
 
-        // Generate JWT Token for automatic login
-      const authToken = fastify.jwt.sign({ email }, { expiresIn: "7d" }); // Token valid for 7 days
+      // Generate JWT Token for automatic login
+      const authToken = fastify.jwt.sign({ email }, { expiresIn: "7d" });
 
       // Set token in cookies (HTTP-Only, Secure)
       reply.setCookie("token", authToken, {
@@ -228,26 +252,44 @@ export default async function userRoutes(fastify: FastifyInstance) {
         path: "/",
       });
 
-        return reply.send({ message: "Email verified successfully!" });
-      } catch (error) {
-        return reply.status(400).send({ message: "Invalid or expired token." });
-      }
+      return reply.send({ message: "Email verified successfully!" });
+    } catch (error) {
+      return reply.status(400).send({ message: "Invalid or expired token." });
     }
-  );
+  }
+);
 
-  fastify.post(
-    "/logout",
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      reply.clearCookie("token", {
-        path: "/",
-        httpOnly: true,
-        secure: true, // Set to false if testing locally without HTTPS
-        sameSite: "strict",
-      });
+  // POST /logout - Log out the user by clearing the authentication token cookie
+fastify.post(
+  "/logout",
+  {
+    schema: {
+      description: "Log out the user by clearing the authentication token cookie",
+      tags: ["Auth"],
+      summary: "User Logout",
+      response: {
+        200: {
+          description: "Logout successful",
+          type: "object",
+          properties: {
+            message: { type: "string" },
+          },
+        },
+      },
+    },
+  },
+  async (request: FastifyRequest, reply: FastifyReply) => {
+    reply.clearCookie("token", {
+      path: "/",
+      httpOnly: true,
+      secure: true, // Set to false if testing locally without HTTPS
+      sameSite: "strict",
+    });
 
-      return reply.send({ message: "Logged out successfully!" });
-    }
-  );
+    return reply.send({ message: "Logged out successfully!" });
+  }
+);
+
 }
 
 
