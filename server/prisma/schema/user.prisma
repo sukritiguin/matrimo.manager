@@ -1,0 +1,11 @@
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  password    String?  // Nullable for OAuth users
+  verified    Boolean  @default(false)
+  googleId    String?  // For Google OAuth
+  otp         String?  // For OTP-based login
+  otpExpiry   DateTime? // OTP expiry time
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
