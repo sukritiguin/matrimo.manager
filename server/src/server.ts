@@ -6,8 +6,8 @@ import fastifyJWT from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
 import fastifyOAuth2 from "@fastify/oauth2";
 import prismaPlugin from "./plugins/prisma";
-import userRoutes from "./routes/users";
-import authRoutes from "./routes/auth";
+import userRoutes from "./routes/user.router";
+import authRoutes from "./routes/auth.router";
 
 declare module "fastify" {
   interface FastifyInstance {
