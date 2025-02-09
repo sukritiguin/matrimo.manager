@@ -44,7 +44,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
     }
   );
   fastify.put(
-    "/update-Profile",
+    "/update-profile",
     { preHandler: [authMiddleware] },
     async (request, reply) => {
       const email = (request.user as { email: string }).email;
@@ -55,7 +55,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
       };
       try {
         const updatedProfile = await fastify.prisma.profile.update({
-          where: { email: "user@example.com" },
+          where: { email: email },
           data: {
             firstName: firstName,
             lastName: lastName,
