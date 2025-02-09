@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./.env" });
+
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
@@ -10,9 +14,16 @@ import userRoutes from "./routes/user.router";
 import authRoutes from "./routes/auth.router";
 import testRoutes from "./routes/test.router";
 import profileRoutes from "./routes/profile.router";
-import dotenv from "dotenv";
 
-dotenv.config();
+console.log("📌 Environment Variables Loaded");
+console.log(
+  "📩 GOOGLE_EMAIL_APP_SENDER_EMAIL:",
+  process.env.GOOGLE_EMAIL_APP_SENDER_EMAIL
+);
+console.log(
+  "🔑 GOOGLE_EMAIL_APP_PASSWORD:",
+  process.env.GOOGLE_EMAIL_APP_PASSWORD
+);
 
 declare module "fastify" {
   interface FastifyInstance {
