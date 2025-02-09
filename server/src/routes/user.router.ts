@@ -9,6 +9,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     {
       schema: {
         description: "Get a list of all users",
+        summary: "List Users",
         tags: ["Users"],
         response: {
           200: {
@@ -51,70 +52,6 @@ export default async function userRoutes(fastify: FastifyInstance) {
     }
   );
 
-  // POST /users - Create a new user
-  fastify.post(
-    "/",
-    {
-      schema: {
-        description: "Create a new user",
-        tags: ["Users"],
-        body: {
-          type: "object",
-          required: ["email", "password"],
-          properties: {
-            email: { type: "string", format: "email" },
-            password: { type: "string", format: "password" },
-          },
-        },
-        response: {
-          201: {
-            type: "object",
-            properties: {
-              id: { type: "number" },
-              email: { type: "string" },
-              password: { type: "string" },
-            },
-          },
-          400: {
-            type: "object",
-            properties: {
-              error: { type: "string" },
-            },
-          },
-          500: {
-            type: "object",
-            properties: {
-              error: { type: "string" },
-            },
-          },
-        },
-      },
-    },
-    async (request, reply) => {
-      if (!fastify.prisma) {
-        return reply.internalServerError("Prisma plugin not registered!");
-      }
-
-      const { email, password } = request.body as {
-        email: string;
-        password: string;
-      };
-
-      try {
-        const user = await fastify.prisma.user.create({
-          data: { email, password },
-        });
-        return reply.code(201).send(user);
-      } catch (error) {
-        console.error("Database Error:", error);
-
-        // Handle unique constraint violation (e.g., duplicate email)
-        // Need to write logic here................................................................
-
-        return reply.internalServerError("Failed to create user");
-      }
-    }
-  );
 
   // POST /register-user - Register a new user
   fastify.post(
@@ -122,6 +59,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     {
       schema: {
         description: "Register a new user",
+        summary: "Register User",
         tags: ["Auth"],
         body: {
           type: "object",
