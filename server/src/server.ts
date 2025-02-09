@@ -9,6 +9,10 @@ import prismaPlugin from "./plugins/prisma";
 import userRoutes from "./routes/user.router";
 import authRoutes from "./routes/auth.router";
 import testRoutes from "./routes/test.router";
+import profileRoutes from "./routes/profile.router";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -91,6 +95,7 @@ fastify.decorate(
 fastify.register(userRoutes, { prefix: "/api/users" });
 fastify.register(authRoutes);
 fastify.register(testRoutes, { prefix: "/api/test" });
+fastify.register(profileRoutes, { prefix: "/api/profile" });
 
 fastify.get("/", async (request, reply) => {
   return {

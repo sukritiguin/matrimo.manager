@@ -4,7 +4,6 @@ import otpGenerator from "otp-generator";
 import { sendOTPEmail } from "../services/email.services";
 
 export default async function authRoutes(fastify: FastifyInstance) {
-  
   /**
    * Google OAuth Callback
    */
@@ -44,13 +43,21 @@ export default async function authRoutes(fastify: FastifyInstance) {
     },
     async (req: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { token } = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(req);
+        const { token } =
+          await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(
+            req
+          );
 
-        const userInfo = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-          headers: { Authorization: `Bearer ${token.access_token}` },
-        }).then((res) => res.json());
+        const userInfo = await fetch(
+          "https://www.googleapis.com/oauth2/v2/userinfo",
+          {
+            headers: { Authorization: `Bearer ${token.access_token}` },
+          }
+        ).then((res) => res.json());
 
-        let user = await fastify.prisma.user.findUnique({ where: { email: userInfo.email } });
+        let user = await fastify.prisma.user.findUnique({
+          where: { email: userInfo.email },
+        });
 
         if (!user) {
           user = await fastify.prisma.user.create({
@@ -62,7 +69,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
           });
         }
 
-        const authToken = fastify.jwt.sign({ email: user.email }, { expiresIn: "7d" });
+        const authToken = fastify.jwt.sign(
+          { email: user.email },
+          { expiresIn: "7d" }
+        );
 
         reply.setCookie("token", authToken, {
           httpOnly: true,
@@ -73,7 +83,9 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
         reply.send({ message: "Logged in with Google.", user });
       } catch (err: any) {
-        reply.status(500).send({ message: "Google OAuth failed.", error: err.message });
+        reply
+          .status(500)
+          .send({ message: "Google OAuth failed.", error: err.message });
       }
     }
   );
@@ -106,7 +118,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (req: FastifyRequest<{ Body: { email: string } }>, reply: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { email: string } }>,
+      reply: FastifyReply
+    ) => {
       const { email } = req.body;
 
       const otp = otpGenerator.generate(6, {
@@ -116,7 +131,9 @@ export default async function authRoutes(fastify: FastifyInstance) {
         specialChars: false,
       });
 
-      const existingUser = await fastify.prisma.user.findUnique({ where: { email } });
+      const existingUser = await fastify.prisma.user.findUnique({
+        where: { email },
+      });
 
       if (existingUser) {
         await fastify.prisma.user.update({
@@ -175,7 +192,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (req: FastifyRequest<{ Body: { email: string; otp: string } }>, reply: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { email: string; otp: string } }>,
+      reply: FastifyReply
+    ) => {
       const { email, otp } = req.body;
 
       const user = await fastify.prisma.user.findUnique({ where: { email } });
@@ -185,7 +205,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
         return;
       }
 
-      const authToken = fastify.jwt.sign({ email: user.email }, { expiresIn: "7d" });
+      const authToken = fastify.jwt.sign(
+        { email: user.email },
+        { expiresIn: "7d" }
+      );
 
       reply.setCookie("token", authToken, {
         httpOnly: true,
