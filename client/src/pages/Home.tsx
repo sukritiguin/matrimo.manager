@@ -1,5 +1,22 @@
-function Home() {
-  return <h1>Home Page</h1>;
-}
+import Features from '../components/landing/feature';
+import Footer from '../components/landing/footer';
+import Hero from '../components/landing/hero';
+import Testimonials from '../components/landing/testimonial';
 
-export default Home;
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-[var(--primary-off-white)] text-[var(--accent-charcoal-gray)]">
+      {/* Hero Section */}
+      <Hero />
+
+      {/* Features Section */}
+      <Features />
+
+      {/* Testimonials */}
+      <Testimonials />
+
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+}
