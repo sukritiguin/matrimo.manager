@@ -34,14 +34,14 @@ return (
       
       {/* Left Side - Login Form */}
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 2.6 }}
         className="p-8 flex flex-col justify-center items-center bg-white"
       >
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-6">
-            <img src="https://img.freepik.com/premium-vector/indian-bride-groom-logo-illustration-hindu-wedding-invitation-card_428817-2235.jpg" alt="Wedding Logo" className="w-40 h-40" />
+            <img src="./logo2.png" alt="Wedding Logo" className="w-60 h-60 mt-0 pt-0" />
           </div>
 
           <h2 className="text-center text-3xl font-extrabold text-[#8B0000] font-cursive">
@@ -102,9 +102,9 @@ return (
 
       {/* Right Side - Wedding-Themed Content */}
       <motion.div
-        initial={{ opacity: 0, x: 20 }}
+        initial={{ opacity: 0, x: 40 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 2.6 }}
         className="hidden lg:flex flex-col justify-center items-center bg-[#8B0000] text-white p-8"
       >
         <img src="https://png.pngtree.com/png-clipart/20231003/original/pngtree-lord-ganesha-png-image_13236682.png" alt="Wedding Decoration" className="w-80 my-0 py-0" />
