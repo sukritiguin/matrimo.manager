@@ -1,6 +1,7 @@
 // src/routes/authRoutes.ts
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import otpGenerator from "otp-generator";
+import argon2 from "argon2";
 import { sendOTPEmail } from "../services/email.services";
 
 export default async function authRoutes(fastify: FastifyInstance) {
@@ -202,6 +203,76 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
       if (!user || user.otp !== otp || new Date() > user.otpExpiry!) {
         reply.status(400).send({ message: "Invalid or expired OTP." });
+        return;
+      }
+
+      const authToken = fastify.jwt.sign(
+        { email: user.email },
+        { expiresIn: "7d" }
+      );
+
+      reply.setCookie("token", authToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+
+      reply.send({ message: "Logged in successfully." });
+    }
+  );
+
+  fastify.post(
+    "/login/password",
+    {
+      schema: {
+        description: "Login user with email and password",
+        tags: ["Auth"],
+        summary: "Password Login",
+        body: {
+          type: "object",
+          required: ["email", "password"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", minLength: 6 },
+          },
+        },
+        response: {
+          200: {
+            description: "User logged in successfully",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+          400: {
+            description: "Invalid credentials",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (
+      req: FastifyRequest<{ Body: { email: string; password: string } }>,
+      reply: FastifyReply
+    ) => {
+      const { email, password } = req.body;
+
+      const user = await fastify.prisma.user.findUnique({ where: { email } });
+
+      if (!user || !user.password || !user.verified) {
+        reply.status(400).send({ message: "Invalid credentials." });
+        return;
+      }
+
+      // const convertedPassword = await argon2.hash(password);
+
+      const isValidPassword = await argon2.verify(user.password, password);
+      if (!isValidPassword) {
+        reply.status(400).send({ message: "Invalid credentials." });
         return;
       }
 
