@@ -10,7 +10,7 @@ export default function Auth() {
   const [isRegistering, setIsRegistering] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center">
+    <div className="min-h-screen mt-20 bg-gradient-to-br flex items-center justify-center">
       <div className="grid grid-cols-1 lg:grid-cols-2 w-3xl mx-auto backdrop-blur-lg shadow-xl rounded-3xl overflow-hidden">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -20,7 +20,11 @@ export default function Auth() {
         >
           <div className="w-full max-w-md">
             <div className="flex justify-center mb-6">
-              <img src="./logo2.png" alt="Wedding Logo" className="w-40" />
+              <img
+                src="./assets/logo2.png"
+                alt="Wedding Logo"
+                className="w-40"
+              />
             </div>
 
             <h2 className="text-center text-3xl font-extrabold text-[#8B0000] font-cursive">
