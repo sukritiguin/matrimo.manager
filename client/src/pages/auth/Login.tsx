@@ -20,11 +20,7 @@ export default function Auth() {
         >
           <div className="w-full max-w-md">
             <div className="flex justify-center mb-6">
-              <img
-                src="./assets/logo2.png"
-                alt="Wedding Logo"
-                className="w-40"
-              />
+              <img src="/logo2.png" alt="Wedding Logo" className="w-40" />
             </div>
 
             <h2 className="text-center text-3xl font-extrabold text-[#8B0000] font-cursive">
