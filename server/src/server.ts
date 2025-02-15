@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./.env" });
+
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
@@ -6,8 +10,20 @@ import fastifyJWT from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
 import fastifyOAuth2 from "@fastify/oauth2";
 import prismaPlugin from "./plugins/prisma";
-import userRoutes from "./routes/users";
-import authRoutes from "./routes/auth";
+import userRoutes from "./routes/user.router";
+import authRoutes from "./routes/auth.router";
+import testRoutes from "./routes/test.router";
+import profileRoutes from "./routes/profile.router";
+
+console.log("📌 Environment Variables Loaded");
+console.log(
+  "📩 GOOGLE_EMAIL_APP_SENDER_EMAIL:",
+  process.env.GOOGLE_EMAIL_APP_SENDER_EMAIL
+);
+console.log(
+  "🔑 GOOGLE_EMAIL_APP_PASSWORD:",
+  process.env.GOOGLE_EMAIL_APP_PASSWORD
+);
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -89,6 +105,8 @@ fastify.decorate(
 
 fastify.register(userRoutes, { prefix: "/api/users" });
 fastify.register(authRoutes);
+fastify.register(testRoutes, { prefix: "/api/test" });
+fastify.register(profileRoutes, { prefix: "/api/profile" });
 
 fastify.get("/", async (request, reply) => {
   return {
@@ -114,5 +132,7 @@ const start = async () => {
     process.exit(1);
   }
 };
+
+export default fastify;
 
 start();

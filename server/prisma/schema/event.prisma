@@ -1,0 +1,23 @@
+enum EventType {
+    WEDDING
+    BIRTHDAY
+    ANNIVERSARY
+    RICE_CEREMONY
+}
+
+model Event{
+    id Int @id @unique @default(autoincrement())
+    email String
+    eventType EventType
+    eventId Int? @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime
+
+    User User @relation(fields: [email], references: [email])
+    RSVPs RSVP[]
+    contactLists ContactList[]
+    wishCards WishCard[]
+    memoryCard MemoryCard[]
+
+    marriageEvent MarriageEvent[]
+}

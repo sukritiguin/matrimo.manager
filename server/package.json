@@ -20,10 +20,13 @@
     "@fastify/swagger-ui": "^5.2.1",
     "@prisma/client": "^6.3.0",
     "argon2": "^0.41.1",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "fastify-plugin": "^5.0.1",
     "fastify-sensible": "^3.1.2",
     "fastify-swagger": "^5.1.1",
+    "http": "^0.0.1-security",
     "nodemailer": "^6.10.0",
     "otp-generator": "^4.0.1"
   },
