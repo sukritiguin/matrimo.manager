@@ -66,7 +66,7 @@ async function sendEmail(
 async function sendVerificationEmail(email: string): Promise<void> {
   try {
     const verificationToken = fastify.jwt.sign({ email }, { expiresIn: "1h" });
-    const verificationLink = `${process.env.BASE_URL}/api/users/verify?token=${verificationToken}&email=${email}`;
+    const verificationLink = `${process.env.CLIENT_BASE_URL}/auth/verify?token=${verificationToken}`;
 
     await sendEmail(
       email,

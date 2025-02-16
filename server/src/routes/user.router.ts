@@ -135,7 +135,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
   );
 
   // GET /verify - Verify the token sent over email
-  fastify.get(
+  fastify.post(
     "/verify",
     {
       schema: {
@@ -144,7 +144,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
         summary: "Email Verification",
         querystring: {
           type: "object",
-          required: ["token", "email"],
+          required: ["token"],
           properties: {
             token: { type: "string", description: "JWT verification token" },
             email: {
@@ -173,20 +173,20 @@ export default async function userRoutes(fastify: FastifyInstance) {
       },
     },
     async (
-      req: FastifyRequest<{ Querystring: { token: string; email: string } }>,
+      req: FastifyRequest<{ Querystring: { token: string } }>,
       reply: FastifyReply
     ) => {
       try {
-        const { token, email } = req.query as { token: string; email: string };
+        const { token } = req.query as { token: string };
 
         // Verify token
-        const decoded = fastify.jwt.verify(token) as { email: string };
+        const { email } = fastify.jwt.verify(token) as { email: string };
 
-        if (decoded.email !== email) {
-          return reply
-            .status(400)
-            .send({ message: "Invalid verification link." });
-        }
+        // if (decoded.email !== email) {
+        //   return reply
+        //     .status(400)
+        //     .send({ message: "Invalid verification link." });
+        // }
 
         // Update user status in DB (mark as verified)
         await fastify.prisma.user.update({

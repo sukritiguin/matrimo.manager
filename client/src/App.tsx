@@ -5,6 +5,7 @@ import './index.css';
 import HomePage from './pages/Home';
 import AboutPage from './pages/About';
 import Navbar from './components/common/navbar';
+import { UserVerify } from './pages/auth/UserVerify';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Routes>
             <Route path="/auth/" element={<AuthPage />}>
               <Route path="login" element={<Login />} />
+              <Route path="verify" element={<UserVerify />} />
             </Route>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
