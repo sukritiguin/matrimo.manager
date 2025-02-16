@@ -1,0 +1,24 @@
+{
+  "name": "matrimo.manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"cd client && npm run dev\" \"cd server && npm run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sukritiguin/matrimo.manager.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sukritiguin/matrimo.manager/issues"
+  },
+  "homepage": "https://github.com/sukritiguin/matrimo.manager#readme",
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
