@@ -4,6 +4,7 @@ import { Input } from '../../components/ui/input';
 import { motion } from 'framer-motion';
 import { cn } from '../../../src/lib/utils';
 import googleIcon from './../../assets/googleIcon.svg';
+import RegisterForm from '../../components/auth/register-form';
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState('email');
@@ -74,26 +75,7 @@ export default function Auth() {
 
             <div className="mt-6">
               {isRegistering ? (
-                <div className="space-y-6">
-                  <Input
-                    label="Email Address"
-                    type="email"
-                    className="border border-[#DAA520] shadow-md"
-                  />
-                  <Input
-                    label="Password"
-                    type="password"
-                    className="border border-[#DAA520] shadow-md"
-                  />
-                  <Input
-                    label="Confirm Password"
-                    type="password"
-                    className="border border-[#DAA520] shadow-md"
-                  />
-                  <Button className="w-full bg-[#8B0000] text-white font-bold py-3 rounded-lg">
-                    Register
-                  </Button>
-                </div>
+                <RegisterForm />
               ) : activeTab === 'email' ? (
                 <div className="space-y-6">
                   <Input

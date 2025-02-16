@@ -7,6 +7,7 @@ import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import fastifyJWT from "@fastify/jwt";
+import cors from "@fastify/cors";
 import fastifyCookie from "@fastify/cookie";
 import fastifyOAuth2 from "@fastify/oauth2";
 import prismaPlugin from "./plugins/prisma";
@@ -34,6 +35,11 @@ declare module "fastify" {
 
 export const fastify = Fastify({
   logger: true,
+});
+
+fastify.register(cors, {
+  origin: "http://localhost:5173",
+  credentials: true,
 });
 
 // Register plugins
