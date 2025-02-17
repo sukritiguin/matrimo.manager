@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  matrimo-db:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: matrimomanager
+    networks:
+      - matrimo-net
+
+networks:
+  matrimo-net:
