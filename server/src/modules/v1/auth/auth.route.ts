@@ -17,4 +17,6 @@ export const authRoutes = (route: FastifyInstance) => {
     { preHandler: [fastify.authenticate] },
     authService.logout
   );
+
+  route.post("/login/google", {}, authService.googleLogin);
 };

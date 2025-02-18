@@ -60,3 +60,21 @@ export const resendEmailVerification = async (email: string) => {
     throw new Error(error.message);
   }
 };
+
+export const userGoogleLogin = async (access_token: string) => {
+  try {
+    const res = await api.post(
+      "/auth/login/google",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error: any) {
+    console.log(error.message);
+    throw error;
+  }
+};

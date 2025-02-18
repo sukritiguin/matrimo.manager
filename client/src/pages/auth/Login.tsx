@@ -3,9 +3,9 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { motion } from "framer-motion";
 import { cn } from "../../../src/lib/utils";
-import googleIcon from "./../../assets/googleIcon.svg";
 import RegisterForm from "../../components/auth/register-form";
 import LoginForm from "@/components/auth/login-form";
+import { GoogleLoginButton } from "@/components/auth/google-login-button";
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState("email");
@@ -80,18 +80,9 @@ export default function Auth() {
               ) : activeTab === "email" ? (
                 <LoginForm />
               ) : activeTab === "google" ? (
-                <div className="text-center">
-                  <Button className="w-full bg-[#8B0000] text-white font-bold py-3 rounded-lg">
-                    <img
-                      src={googleIcon}
-                      alt="Google Icon"
-                      width={36}
-                      height={36}
-                    />{" "}
-                    Sign in with Google
-                  </Button>
-                </div>
+                <GoogleLoginButton />
               ) : (
+                // </div>
                 <div className="space-y-6">
                   <Input
                     label="Phone Number"

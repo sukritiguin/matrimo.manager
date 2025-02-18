@@ -225,3 +225,55 @@ export const resendVerificationToken = apiHandler(
       );
   }
 );
+
+export const googleLogin = apiHandler(
+  async (req: FastifyRequest, reply: FastifyReply) => {
+    const authHeaders = req.headers.authorization;
+    if (!authHeaders) {
+      throw new ApiError(401, "Unauthorized: No authorization header provided");
+    }
+    const [authType, authToken] = authHeaders.split(" ");
+    if (authType.toLowerCase() !== "bearer") {
+      throw new ApiError(401, "Unauthorized: Invalid authorization header");
+    }
+
+    const googleUser = await fetch(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: { Authorization: `Bearer ${authToken}` },
+      }
+    ).then((res) => res.json());
+
+    if (!googleUser.email) {
+      throw new ApiError(401, "Unauthorized: Invalid Google user");
+    }
+    let user = await fastify.prisma.user.findUnique({
+      where: { email: googleUser.email },
+    });
+    if (!user) {
+      user = await fastify.prisma.user.create({
+        data: {
+          email: googleUser.email,
+          googleId: googleUser.id,
+          verified: true,
+        },
+      });
+    }
+
+    const playload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    const refreshToken = RefreshToken.generate(playload);
+    const accessToken = AccessToken.generate(playload);
+    return reply
+      .cookie("access_token", accessToken, { ...cookieOptions })
+      .cookie("refresh_token", refreshToken, {
+        ...cookieOptions,
+        expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
+      })
+      .code(200)
+      .send(new ApiResponseMessage(200, "Google login successfully"));
+  }
+);
