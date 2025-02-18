@@ -164,10 +164,10 @@ export const refreshToken = apiHandler(
 
 export const emailVerify = apiHandler(
   async (
-    req: FastifyRequest<{ Params: { token: string } }>,
+    req: FastifyRequest<{ Querystring: { token: string } }>,
     reply: FastifyReply
   ) => {
-    const token: string = req.params?.token;
+    const token: string = req.query.token;
     if (!token) {
       throw new ApiError(400, "Invalid verification token");
     }
@@ -195,6 +195,33 @@ export const emailVerify = apiHandler(
         expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
       })
       .code(200)
-      .send(new ApiResponseMessage(200, "Refresh Token successfully"));
+      .send(new ApiResponseMessage(200, "Email verified successfully"));
+  }
+);
+
+export const resendVerificationToken = apiHandler(
+  async (
+    req: FastifyRequest<{ Params: { email: string } }>,
+    reply: FastifyReply
+  ) => {
+    const { email } = req.params;
+    if (!email) {
+      throw new ApiError(400, "Email is requied");
+    }
+    const user = await fastify.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    if (user.verified) {
+      throw new ApiError(400, "User is already verified");
+    }
+
+    await sendVerificationEmail(user.email);
+    return reply
+      .status(200)
+      .send(
+        new ApiResponseMessage(200, "Verification token sent successfully")
+      );
   }
 );

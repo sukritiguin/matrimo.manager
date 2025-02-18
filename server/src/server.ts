@@ -88,13 +88,20 @@ fastify.decorate(
         throw new ApiError(401, "Access token not provided");
       }
       const decodedToken: any = fastify.jwt.verify(access_token);
-      console.log(decodedToken);
       if (!decodedToken) {
         throw new ApiError(401, "Invalid access token");
       }
       const user = await fastify.prisma.user.findUnique({
         where: { id: decodedToken.id },
+        select: {
+          id: true,
+          email: true,
+          createdAt: true,
+          updatedAt: true,
+          verified: true,
+        },
       });
+
       if (!user) {
         throw new ApiError(401, "User not found");
       }

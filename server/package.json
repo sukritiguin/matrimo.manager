@@ -7,7 +7,10 @@
     "dev": "ts-node-dev src/app.ts",
     "build": "tsc",
     "start": "tsc && node dist/app.js",
-    "prisma:gen": "prisma generator"
+    "prisma:gen": "prisma generator",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma generate",
+    "prisma:studio": "prisma studio"
   },
   "keywords": [],
   "author": "",
