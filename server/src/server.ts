@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-
-dotenv.config({ path: "./.env" });
-
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
@@ -16,15 +12,10 @@ import authRoutes from "./routes/auth.router";
 import testRoutes from "./routes/test.router";
 import profileRoutes from "./routes/profile.router";
 
-console.log("📌 Environment Variables Loaded");
-console.log(
-  "📩 GOOGLE_EMAIL_APP_SENDER_EMAIL:",
-  process.env.GOOGLE_EMAIL_APP_SENDER_EMAIL
-);
-console.log(
-  "🔑 GOOGLE_EMAIL_APP_PASSWORD:",
-  process.env.GOOGLE_EMAIL_APP_PASSWORD
-);
+import { ApiError } from "./libs/response";
+import { env } from "./config/env";
+
+env.check();
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -34,11 +25,11 @@ declare module "fastify" {
 }
 
 export const fastify = Fastify({
-  logger: true,
+  //   logger: true,
 });
 
 fastify.register(cors, {
-  origin: "http://localhost:5173",
+  origin: env.get("CLIENT_URL"),
   credentials: true,
 });
 
@@ -70,18 +61,8 @@ fastify.register(swaggerUI, {
 });
 
 // JWT setup
-fastify.register(fastifyJWT, {
-  secret: "your-secret-key", // Use a strong secret key
-  cookie: {
-    cookieName: "token",
-    signed: false,
-  },
-});
-
-// Cookie setup
-fastify.register(fastifyCookie, {
-  secret: "your-cookie-secret", // Use a strong secret key
-});
+fastify.register(fastifyJWT, { secret: env.get("JWT_SECRET") });
+fastify.register(fastifyCookie, { secret: env.get("JWT_SECRET") });
 
 // Register OAuth2 Plugin
 fastify.register(fastifyOAuth2 as any, {
@@ -102,43 +83,48 @@ fastify.decorate(
   "authenticate",
   async (req: FastifyRequest, reply: FastifyReply) => {
     try {
-      await req.jwtVerify(); // Verify JWT
-    } catch (err) {
-      reply.status(401).send({ message: "Unauthorized" });
+      const access_token = req.cookies?.access_token;
+      if (!access_token) {
+        throw new ApiError(401, "Access token not provided");
+      }
+      const decodedToken: any = fastify.jwt.verify(access_token);
+      if (!decodedToken) {
+        throw new ApiError(401, "Invalid access token");
+      }
+      const user = await fastify.prisma.user.findUnique({
+        where: { id: decodedToken.id },
+        select: {
+          id: true,
+          email: true,
+          createdAt: true,
+          updatedAt: true,
+          verified: true,
+        },
+      });
+
+      if (!user) {
+        throw new ApiError(401, "User not found");
+      }
+      req.user = user;
+    } catch (err: any) {
+      if (err instanceof ApiError) {
+        reply.status(err.statusCode).send(err);
+        return;
+      }
+      reply
+        .status(401)
+        .send(new ApiError(err.statusCode || 401, "Access denied"));
     }
   }
 );
+
+// Routes
+import { v1Routers } from "./modules/v1";
+fastify.register(v1Routers, { prefix: "/api/v1/" });
 
 fastify.register(userRoutes, { prefix: "/api/users" });
 fastify.register(authRoutes);
 fastify.register(testRoutes, { prefix: "/api/test" });
 fastify.register(profileRoutes, { prefix: "/api/profile" });
 
-fastify.get("/", async (request, reply) => {
-  return {
-    message: "Hello, Fastify with TypeScript! Write code with Sukriti.",
-  };
-});
-
-// Protected route example
-fastify.get(
-  "/protected",
-  { onRequest: [fastify.authenticate] },
-  async (req, reply) => {
-    reply.send({ message: "You are authenticated." });
-  }
-);
-
-const start = async () => {
-  try {
-    await fastify.listen({ port: 3000 });
-    console.log("Server is running on http://localhost:3000");
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-
 export default fastify;
-
-start();

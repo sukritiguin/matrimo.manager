@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { motion } from 'framer-motion';
-import { cn } from '../../../src/lib/utils';
-import googleIcon from './../../assets/googleIcon.svg';
-import RegisterForm from '../../components/auth/register-form';
+import { useState } from "react";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { motion } from "framer-motion";
+import { cn } from "../../../src/lib/utils";
+import googleIcon from "./../../assets/googleIcon.svg";
+import RegisterForm from "../../components/auth/register-form";
+import LoginForm from "@/components/auth/login-form";
 
 export default function Auth() {
-  const [activeTab, setActiveTab] = useState('email');
+  const [activeTab, setActiveTab] = useState("email");
   const [isRegistering, setIsRegistering] = useState(false);
 
   return (
@@ -26,47 +27,47 @@ export default function Auth() {
 
             <h2 className="text-center text-3xl font-extrabold text-[#8B0000] font-cursive">
               {isRegistering
-                ? 'Create an Account'
-                : 'Welcome to the Celebration!'}
+                ? "Create an Account"
+                : "Welcome to the Celebration!"}
             </h2>
             <p className="text-center text-[#DAA520] text-sm font-semibold">
               {isRegistering
-                ? 'Register to join the journey.'
-                : 'Login to be a part of this beautiful journey.'}
+                ? "Register to join the journey."
+                : "Login to be a part of this beautiful journey."}
             </p>
 
             {!isRegistering && (
               <div className="flex justify-center gap-4 mt-6">
                 <Button
                   className={cn(
-                    'py-2 px-4 rounded-lg font-bold',
-                    activeTab === 'email'
-                      ? 'bg-[#8B0000] text-white'
-                      : 'bg-gray-200'
+                    "py-2 px-4 rounded-lg font-bold",
+                    activeTab === "email"
+                      ? "bg-[#8B0000] text-white"
+                      : "bg-gray-200"
                   )}
-                  onClick={() => setActiveTab('email')}
+                  onClick={() => setActiveTab("email")}
                 >
                   Email Login
                 </Button>
                 <Button
                   className={cn(
-                    'py-2 px-4 rounded-lg font-bold',
-                    activeTab === 'google'
-                      ? 'bg-[#8B0000] text-white'
-                      : 'bg-gray-200'
+                    "py-2 px-4 rounded-lg font-bold",
+                    activeTab === "google"
+                      ? "bg-[#8B0000] text-white"
+                      : "bg-gray-200"
                   )}
-                  onClick={() => setActiveTab('google')}
+                  onClick={() => setActiveTab("google")}
                 >
                   Google Login
                 </Button>
                 <Button
                   className={cn(
-                    'py-2 px-4 rounded-lg font-bold',
-                    activeTab === 'otp'
-                      ? 'bg-[#8B0000] text-white'
-                      : 'bg-gray-200'
+                    "py-2 px-4 rounded-lg font-bold",
+                    activeTab === "otp"
+                      ? "bg-[#8B0000] text-white"
+                      : "bg-gray-200"
                   )}
-                  onClick={() => setActiveTab('otp')}
+                  onClick={() => setActiveTab("otp")}
                 >
                   OTP Login
                 </Button>
@@ -76,23 +77,9 @@ export default function Auth() {
             <div className="mt-6">
               {isRegistering ? (
                 <RegisterForm />
-              ) : activeTab === 'email' ? (
-                <div className="space-y-6">
-                  <Input
-                    label="Email Address"
-                    type="email"
-                    className="border border-[#DAA520] shadow-md"
-                  />
-                  <Input
-                    label="Password"
-                    type="password"
-                    className="border border-[#DAA520] shadow-md"
-                  />
-                  <Button className="w-full bg-[#8B0000] text-white font-bold py-3 rounded-lg">
-                    Login
-                  </Button>
-                </div>
-              ) : activeTab === 'google' ? (
+              ) : activeTab === "email" ? (
+                <LoginForm />
+              ) : activeTab === "google" ? (
                 <div className="text-center">
                   <Button className="w-full bg-[#8B0000] text-white font-bold py-3 rounded-lg">
                     <img
@@ -100,7 +87,7 @@ export default function Auth() {
                       alt="Google Icon"
                       width={36}
                       height={36}
-                    />{' '}
+                    />{" "}
                     Sign in with Google
                   </Button>
                 </div>
@@ -121,7 +108,7 @@ export default function Auth() {
             <p className="text-center text-sm text-gray-600 mt-4">
               {isRegistering ? (
                 <>
-                  Already have an account?{' '}
+                  Already have an account?{" "}
                   <span
                     className="text-[#DAA520] font-semibold hover:underline cursor-pointer"
                     onClick={() => setIsRegistering(false)}
@@ -131,7 +118,7 @@ export default function Auth() {
                 </>
               ) : (
                 <>
-                  New to Invitaria?{' '}
+                  New to Invitaria?{" "}
                   <span
                     className="text-[#DAA520] font-semibold hover:underline cursor-pointer"
                     onClick={() => setIsRegistering(true)}
