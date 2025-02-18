@@ -1,10 +1,9 @@
-import React from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { UserRegisterSchema } from '../../schemas';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { TUserRegisterSchema, UserRegisterSchema } from "../../schemas";
 
-import { Button } from '../ui/button';
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -12,30 +11,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form';
-import { Input } from '../ui/input';
-import { userRegister } from '@/services/auth.service';
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { userRegister } from "@/services/auth.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof UserRegisterSchema>>({
     resolver: zodResolver(UserRegisterSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof UserRegisterSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    const res  = await userRegister(values);
-    console.log(res)
+  const queryClient = useQueryClient();
+  const { mutate: register } = useMutation({
+    mutationKey: ["user", "register"],
+    mutationFn: userRegister,
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+      form.reset();
+      navigate("/", { relative: "path" });
+    },
+  });
+
+  async function onSubmit(values: TUserRegisterSchema) {
+    register(values);
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
