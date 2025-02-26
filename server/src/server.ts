@@ -1,9 +1,13 @@
+import dotenv from "dotenv";
+
+dotenv.config();
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import fastifyJWT from "@fastify/jwt";
 import cors from "@fastify/cors";
+
 import fastifyCookie from "@fastify/cookie";
 import fastifyOAuth2 from "@fastify/oauth2";
 import prismaPlugin from "./plugins/prisma";
@@ -16,6 +20,7 @@ import { ApiError } from "./libs/response";
 import { env } from "./config/env";
 
 env.check();
+
 
 declare module "fastify" {
   interface FastifyInstance {
