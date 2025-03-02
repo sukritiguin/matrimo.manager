@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Events } from "./data";
+import { slugify } from "@/lib/slugify";
 
 export const EventsPage = () => {
   return (
@@ -38,7 +39,7 @@ const EventCard = (event: (typeof Events)[number]) => {
       //   backgroundColor: "var(--primary-off-white)",
       //   borderColor: "var(--accent-charcoal-gray)",
       // }}
-      onClick={() => navigate(`/events/${event.name.toLowerCase()}`)}
+      onClick={() => navigate(`/events/${slugify(event.name)}`)}
     >
       <CardHeader>
         <CardTitle className="text-2xl font-semibold text-white">
