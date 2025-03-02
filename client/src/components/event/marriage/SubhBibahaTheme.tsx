@@ -5,7 +5,23 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, MapPin, Heart, Users, Gift } from "lucide-react";
+import {
+  CalendarDays,
+  Clock,
+  MapPin,
+  Heart,
+  Users,
+  Gift,
+  Edit,
+} from "lucide-react";
+import { useState } from "react";
+import {
+  DialogContent,
+  Dialog,
+  DialogOverlay,
+  DialogHeader,
+} from "@/components/ui/dialog";
+import WeddingEventForm from "./forms/WeddingEventForm ";
 
 interface WeddingEvent {
   brideName: string;
@@ -29,7 +45,45 @@ interface HinduWeddingCardProps {
   event: WeddingEvent;
 }
 
+export interface WeddingEventFormDataInterface {
+  brideName: string;
+  brideFatherName: string;
+  brideMotherName: string;
+  groomName: string;
+  groomFatherName: string;
+  groomMotherName: string;
+  weddingDate: string; // Storing the date in string (ISO format YYYY-MM-DD)
+  muhuratTime: string;
+  venueName: string;
+  venueAddress: string;
+  haldiCeremony: { date: string; time: string; venue: string };
+  mehendiCeremony: { date: string; time: string; venue: string };
+  sangeetCeremony: { date: string; time: string; venue: string };
+  reception: { date: string; time: string; venue: string };
+  rsvpContact: string;
+}
+
 export function SubhBibahaTheme({ event }: HinduWeddingCardProps) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const [formData, setFormData] = useState<WeddingEventFormDataInterface>({
+    brideName: "",
+    brideFatherName: "",
+    brideMotherName: "",
+    groomName: "",
+    groomFatherName: "",
+    groomMotherName: "",
+    weddingDate: "",
+    muhuratTime: "",
+    venueName: "",
+    venueAddress: "",
+    haldiCeremony: { date: "", time: "", venue: "" },
+    mehendiCeremony: { date: "", time: "", venue: "" },
+    sangeetCeremony: { date: "", time: "", venue: "" },
+    reception: { date: "", time: "", venue: "" },
+    rsvpContact: "",
+  });
+
   const formatDate = (date: Date) =>
     date.toLocaleDateString("en-IN", {
       weekday: "long",
@@ -41,6 +95,11 @@ export function SubhBibahaTheme({ event }: HinduWeddingCardProps) {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-rose-100 to-gold-100 p-8">
       <div className="relative w-full max-w-4xl bg-white shadow-2xl rounded-lg overflow-hidden border-2 border-gold-500">
+        <div className="absolute top-4 right-4">
+          <Button onClick={() => setIsEditDialogOpen(true)} variant="outline">
+            <Edit className="w-5 h-5" />
+          </Button>
+        </div>
         {/* Fold Line */}
         <div className="absolute inset-y-0 left-1/2 w-1 bg-gold-500 transform -translate-x-1/2"></div>
 
@@ -188,6 +247,17 @@ export function SubhBibahaTheme({ event }: HinduWeddingCardProps) {
           </Button>
         </CardFooter>
       </div>
+
+      <Dialog
+        open={isEditDialogOpen}
+        onOpenChange={(open: boolean) => setIsEditDialogOpen(open)}
+      >
+        <DialogOverlay className="bg-black/30 backdrop-blur-sm" />
+        <DialogContent className="bg-white max-h-[80vh] overflow-y-auto">
+          <DialogHeader>Edit Wedding Details</DialogHeader>
+          <WeddingEventForm formData={formData} setFormData={setFormData} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
