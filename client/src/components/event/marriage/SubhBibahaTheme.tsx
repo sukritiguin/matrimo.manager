@@ -41,7 +41,7 @@ interface WeddingEvent {
   rsvpContact: string;
 }
 
-interface HinduWeddingCardProps {
+export interface HinduWeddingCardProps {
   event: WeddingEvent;
 }
 

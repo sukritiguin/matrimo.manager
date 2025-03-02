@@ -1,11 +1,12 @@
 import { ClassicEleganceTheme } from "@/components/event/marriage/ClassicEleganceTheme";
+import { SubhBibahaTheme } from "@/components/event/marriage/editible/SubhBibahaTheme";
 import { ElegantWeddingsTheme } from "@/components/event/marriage/ElegantWeddingsTheme";
 import {
   ClassicEleganceThemePreview,
   ElegantWeddingsThemePreview,
   SubhBibahaThemePreview,
 } from "@/components/event/marriage/preview/ThemePreviews";
-import { SubhBibahaTheme } from "@/components/event/marriage/SubhBibahaTheme";
+// import { SubhBibahaTheme } from "@/components/event/marriage/SubhBibahaTheme";
 
 export const weedingMappedTheme = {
   "elegent-wedding-theme": ElegantWeddingsTheme,
