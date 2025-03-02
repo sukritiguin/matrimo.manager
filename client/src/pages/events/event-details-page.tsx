@@ -1,16 +1,16 @@
 import React from "react";
-import { slugify } from "@/lib/slugify";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Events, MarriageCards, sampleEvent } from "./data";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { sampleEvent } from "./data";
 import { weedingMappedTheme } from "./theme-mapping";
-import { convertToTitleCase } from "@/lib/basic.utility";
 import MarriageCard from "./marriage-card";
+import { useGetEventParam } from "./hooks/useGetEventParam";
+import { Button } from "@/components/ui/button";
 
 const TemplatePage = React.lazy(() => import("./templete-page"));
 // const MarriageCard = React.lazy(() => import("./marriage-card"));
 
 export const EventDetailsPage = () => {
-  const params = useParams();
+  const eventName = useGetEventParam();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -36,28 +36,47 @@ export const EventDetailsPage = () => {
     }
   }
 
-  const eventName = params["event"];
-
-  const isValidEvent = Object.values(Events).some(
-    (event) => event.name.toLowerCase() === eventName
-  );
-
-  if (!eventName || !isValidEvent) {
-    return <h1>Event Not Found</h1>;
+  if (!eventName) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h1 className="text-xl font-bold text-center">Event Details</h1>
+        <p>
+          Event not found. Please check the event name and try again.
+          <br />
+          <br />
+          <Button variant="outline" asChild>
+            <Link to="/" onClick={() => navigate("/")}>
+              Back to Homepage
+            </Link>
+          </Button>
+        </p>
+      </div>
+    );
   }
 
+  if (eventName === "Wedding Celebration") {
+    return <MarriageCard />;
+  }
+  // TODO: add more events
+
   return (
-    // <div className="w-full grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-    //   {/* {MarriageCards.map((marriageCard, index) => (
-    //     <MarriageCard
-    //       key={index}
-    //       marriageCard={marriageCard}
-    //       onClick={() => {
-    //         navigate(`/events/${eventName}?t=${slugify(marriageCard.name)}`);
-    //       }}
-    //     />
-    //   ))} */}
-    // </div>
-    <MarriageCard />
+    <div className="flex flex-col items-center justify-center h-screen">
+      <h1 className="text-xl font-bold text-center">
+        Event Details: {eventName}
+      </h1>
+      <p>Coming soon</p>
+    </div>
   );
 };
+
+// <div className="w-full grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+//   {/* {MarriageCards.map((marriageCard, index) => (
+//     <MarriageCard
+//       key={index}
+//       marriageCard={marriageCard}
+//       onClick={() => {
+//         navigate(`/events/${eventName}?t=${slugify(marriageCard.name)}`);
+//       }}
+//     />
+//   ))} */}
+// </div>

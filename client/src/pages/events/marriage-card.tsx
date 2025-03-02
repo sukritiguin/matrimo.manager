@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { weedingMappedThemeWithComponents } from "./theme-mapping";
 import { Link } from "react-router-dom";
+import { slugify } from "@/lib/slugify";
+import { useGetEventParam } from "./hooks/useGetEventParam";
 
 export const MarriageCard = () => {
+  const eventName = useGetEventParam();
   const [selectedTheme, setSelectedTheme] = useState<string>(
     weedingMappedThemeWithComponents[0].name
   );
@@ -67,11 +70,7 @@ export const MarriageCard = () => {
 
           <div className="p-6 text-center">
             <Link
-              to={`/events/weeding celebration?t=${decodeURIComponent(
-                selectedThemeData.name
-              )
-                .toLowerCase()
-                .replace(/ /g, "-")}`}
+              to={`/events/${slugify(eventName!)}?t=${slugify(selectedThemeData.name)}`}
               className="inline-block px-8 py-3 text-lg font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
             >
               View Full Theme
