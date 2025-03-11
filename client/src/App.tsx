@@ -11,6 +11,7 @@ import { AuthRoutes } from "./lib/utils";
 import { useSession } from "./hooks/use-session";
 import { EventDetailsPage, EventsPage, EventsPageLayout } from "./pages/events";
 import { RootLayout } from "./components/layout";
+import { EditorPage } from "./features/editor/page";
 
 function App() {
   const { pathname } = useLocation();
@@ -41,6 +42,8 @@ function App() {
           <Route path=":event" element={<EventDetailsPage />} />
         </Route>
       </Route>
+      {/* Editor */}
+      <Route path="/editor" element={<EditorPage />} />
     </Routes>
   );
 }
