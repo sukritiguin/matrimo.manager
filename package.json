@@ -33,7 +33,7 @@
     "prettier": "^3.5.1"
   },
   "devDependencies": {
-    "husky": "^8.0.0",
+    "husky": "^8.0.3",
     "lint-staged": "^15.4.3"
   }
 }

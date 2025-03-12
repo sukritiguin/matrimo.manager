@@ -30,6 +30,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { useColorPicker } from "@/hooks/useColorPicker";
 
 export const CanvasToolbar: React.FC = () => {
   const {
@@ -44,11 +45,13 @@ export const CanvasToolbar: React.FC = () => {
     resetZoom,
   } = useCanvasStore();
   const [showGrid, setShowGrid] = React.useState(false);
-  const [color, setColor] = React.useState(DEFAULT_BACKGROUND_COLOR);
-  const [isOpen, setIsOpen] = React.useState(false);
+
+  const fontColorPicker = useColorPicker("black");
+  const backgroundColorPicker = useColorPicker(DEFAULT_BACKGROUND_COLOR);
 
   const handleColorChange = (color: string) => {
-    setColor(color);
+    backgroundColorPicker.setColor(color);
+    console.log("Current Color is: ", color);
     if (canvas) {
       canvas.backgroundColor = color;
       canvas.requestRenderAll();
@@ -104,24 +107,55 @@ export const CanvasToolbar: React.FC = () => {
         </Select>
       </div>
 
-      {/* Background color */}
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild className="px-4">
-          <Button variant="outline" asChild>
+      <Popover
+        open={fontColorPicker.isOpen}
+        onOpenChange={fontColorPicker.setIsOpen}
+      >
+        <PopoverTrigger asChild>
+          <Button variant="outline">
+            <span
+              className="h-4 w-4 border rounded-full"
+              style={{ backgroundColor: fontColorPicker.color }}
+            />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-60 p-4">
+          <HexColorPicker
+            color={fontColorPicker.color}
+            onChange={fontColorPicker.setColor}
+          />
+          <Input
+            className="mt-2"
+            value={fontColorPicker.color}
+            onChange={(e) => fontColorPicker.setColor(e.target.value)}
+          />
+        </PopoverContent>
+      </Popover>
+
+      {/* Background Color Picker */}
+      <Popover
+        open={backgroundColorPicker.isOpen}
+        onOpenChange={backgroundColorPicker.setIsOpen}
+      >
+        <PopoverTrigger asChild>
+          <Button variant="outline">
             <div>
               Background
               <span
                 className="h-full w-8 border rounded-sm"
-                style={{ backgroundColor: color }}
+                style={{ backgroundColor: backgroundColorPicker.color }}
               />
             </div>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-60 p-4">
-          <HexColorPicker color={color} onChange={handleColorChange} />
+          <HexColorPicker
+            color={backgroundColorPicker.color}
+            onChange={(e) => handleColorChange(e)}
+          />
           <Input
             className="mt-2"
-            value={color}
+            value={backgroundColorPicker.color}
             onChange={(e) => handleColorChange(e.target.value)}
           />
         </PopoverContent>

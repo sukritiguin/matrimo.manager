@@ -21,6 +21,14 @@ export const Canvas: React.FC = () => {
     canvas.on("selection:created", function (e) {
       console.log("Object selected:", e.selected);
       setSelectedElement([...e.selected]);
+
+      if (e.selected) {
+        console.log("Selected object(s):", e.selected);
+        e.selected.forEach((obj) => {
+          console.log("Object type:", obj.type);
+        });
+        setSelectedElement([...e.selected]);
+      }
     });
 
     canvas.on("selection:updated", function (e) {
@@ -33,9 +41,18 @@ export const Canvas: React.FC = () => {
     });
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.key === "Delete" || event.key === "Backspace") && canvas) {
+      if (!canvas) return;
+      if (event.key === "Delete") {
         if (selectObject.length > 0) {
           selectObject.forEach((obj) => canvas.remove(obj));
+        }
+      } else if (event.key === "Backspace") {
+        if (selectObject.length > 0) {
+          selectObject.forEach((obj) => {
+            if (obj.type !== "textbox") {
+              canvas.remove(obj);
+            }
+          });
         }
       }
     };
