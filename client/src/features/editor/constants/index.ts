@@ -77,6 +77,12 @@ export const elements = [
     type: "Shape",
     image: "/placeholder.svg?height=80&width=80",
   },
+  {
+    id: "image",
+    name: "Image",
+    type: "Image",
+    image: "/placeholder.svg?height=80&width=80",
+  },
 ] as const;
 
 export const CANVAS_PRESETS = [

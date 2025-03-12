@@ -41,6 +41,8 @@ export const LeftSidebar = () => {
     } else if (elementId === "triangle") {
       canvas.add(Fabric_TRIANGLE);
       canvas.setActiveObject(Fabric_TRIANGLE);
+    } else if (elementId === "image") {
+      //   TODO: Implement
     }
   };
 
@@ -118,6 +120,7 @@ const ElementsTabContent: React.FC<{
             </Card>
           ))}
         </div>
+        <input id="addImage" type="image" hidden />
       </div>
     </TabsContent>
   );
