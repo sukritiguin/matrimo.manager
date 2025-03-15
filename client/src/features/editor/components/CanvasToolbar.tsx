@@ -4,11 +4,7 @@ import * as React from "react";
 import { ToolTip } from "@/components/common/tooltip";
 import { Button } from "@/components/ui/button";
 import { Grid, InspectionPanel } from "lucide-react";
-import {
-  DEFAULT_BACKGROUND_COLOR,
-  MAX_ZOOM_LABEL,
-  MIN_ZOOM_LABEL,
-} from "../constants";
+import { DEFAULT_ZOOM_LABEL, MAX_ZOOM_LABEL, MIN_ZOOM_LABEL } from "../constants";
 
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { ScreenShareIcon as ScreenRotation } from "lucide-react";
@@ -20,44 +16,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCanvasStore } from "../stores/useCanvasStore";
 import { Slider } from "@/components/ui/slider";
 
-import { HexColorPicker } from "react-colorful";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import { useColorPicker } from "@/hooks/useColorPicker";
 import { ColorPicker } from "@/components/color-picker";
+import { useCanvas } from "../hooks/useCanvas";
 
 export const CanvasToolbar: React.FC = () => {
   const {
-    canvas,
+    handleZoom,
+    zoomLevel,
     orientation,
     canvasPresets,
-    toggleOrientation,
     selectedCanvasPreset,
+    onToggleOrientation,
     changeCanvasPreset,
-    zoomLevel,
-    handleZoom,
-    resetZoom,
-  } = useCanvasStore();
+    backgroundColorPicker,
+  } = useCanvas();
   const [showGrid, setShowGrid] = React.useState(false);
-
-  const fontColorPicker = useColorPicker("black");
-
-  const backgroundColorPicker = useColorPicker(
-    DEFAULT_BACKGROUND_COLOR,
-    (color: string) => {
-      if (canvas) {
-        canvas.backgroundColor = color;
-        canvas.requestRenderAll();
-      }
-    }
-  );
 
   return (
     <div className="flex items-center justify-between p-2 border-b">
@@ -73,26 +48,17 @@ export const CanvasToolbar: React.FC = () => {
           </Button>
         </ToolTip>
 
-        <ToolTip
-          text={
-            orientation === "Portrait"
-              ? "Switch to Landscape"
-              : "Switch to Portrait"
-          }
-        >
+        <ToolTip text={orientation === "Portrait" ? "Switch to Landscape" : "Switch to Portrait"}>
           <Button
             variant={orientation === "Landscape" ? "outline" : "default"}
             size="icon"
-            onClick={toggleOrientation}
+            onClick={onToggleOrientation}
           >
             <ScreenRotation className="h-4 w-4" />
           </Button>
         </ToolTip>
 
-        <Select
-          value={selectedCanvasPreset.id}
-          onValueChange={changeCanvasPreset}
-        >
+        <Select value={selectedCanvasPreset.id} onValueChange={changeCanvasPreset}>
           <SelectTrigger className="w-28">
             <SelectValue placeholder="Size" />
           </SelectTrigger>
@@ -174,7 +140,7 @@ export const CanvasToolbar: React.FC = () => {
             </Button>
           </ToolTip>
           <ToolTip text="Reset zoom">
-            <Button variant="outline" size="icon" onClick={resetZoom}>
+            <Button variant="outline" size="icon" onClick={() => handleZoom(DEFAULT_ZOOM_LABEL)}>
               <InspectionPanel className="size-4" />
             </Button>
           </ToolTip>

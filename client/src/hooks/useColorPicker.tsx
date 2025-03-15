@@ -1,7 +1,8 @@
+import { DEFAULT_BACKGROUND_COLOR } from "@/features/editor/constants";
 import { useState } from "react";
 
 export const useColorPicker = (
-  initialColor: string,
+  initialColor: string = DEFAULT_BACKGROUND_COLOR,
   onChange?: (currentColor: string) => void
 ) => {
   const [color, setColor] = useState(initialColor);
