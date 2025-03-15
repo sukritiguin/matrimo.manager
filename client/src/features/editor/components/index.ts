@@ -1,5 +1,5 @@
 export * from "./Header";
-export * from "./ZoomControls";
+// export * from "./ZoomControls";
 export * from "./OrientationControls";
 export * from "./LeftSidbar";
 export * from "./RightSidebar";
