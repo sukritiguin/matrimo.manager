@@ -17,6 +17,15 @@ import { useColorPicker } from "@/hooks/useColorPicker";
 import { Separator } from "@radix-ui/react-separator";
 import { Trash2 } from "lucide-react";
 import { FaAlignCenter, FaAlignLeft, FaAlignRight } from "react-icons/fa";
+import { useEditObject } from "../hooks/useEditObject";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 const BorderVariants = [
   {
@@ -77,21 +86,15 @@ const ElementBorder: React.FC<{
 
 export const ToolbarPopover = ({
   editableObject,
-  canvas,
   textColor,
   backgroundColor,
   borderColor,
   deleteObject,
-  updateObject,
-}: {
-  editableObject: any;
-  canvas: any;
-  textColor: any;
-  backgroundColor: any;
-  borderColor: any;
-  deleteObject: any;
-  updateObject: (newProps: Record<string, any>) => void;
-}) => {
+  updateObjectProperty,
+}: ReturnType<typeof useEditObject>) => {
+  if (!editableObject) return null;
+
+  console.log(editableObject.fontfamily);
   return (
     <div className="flex flex-wrap gap-2 items-center">
       {/* Font Family Selector */}
@@ -102,153 +105,113 @@ export const ToolbarPopover = ({
           className="border border-muted bg-muted rounded-md p-1"
         />
       </ToolTip>
-
       {/* ELEMENT BORDER */}
       <ToolTip text="Border" className="flex items-center">
         <ElementBorder borderColor={borderColor} />
       </ToolTip>
       <Separator orientation="vertical" />
-
       <Separator orientation="vertical" />
       <ToolTip text="Delete" className="flex items-center">
         <button onClick={deleteObject}>
           <Trash2 className="size-6 text-destructive" />
         </button>
       </ToolTip>
-
-      <ToolTip text="Font Family" className="flex items-center">
-        <select
-          value={editableObject.fontFamily} // Bind the selected value to the editableObject's fontFamily
-          onChange={(e) => {
-            const newFontFamily = e.target.value;
-            console.log("Selected font family:", newFontFamily);
-
-            // Update the fontFamily of the editableObject (Fabric.js Textbox)
-            editableObject.set("fontFamily", newFontFamily);
-
-            // Re-render the canvas to apply the changes
-            canvas?.renderAll();
-          }}
-          className="border p-1 rounded"
+      {editableObject.type === "textbox" && (
+        <Select
+          value={editableObject.fontfamily}
+          onValueChange={(value) => updateObjectProperty("fontFamily", value)}
         >
-          <option value="Arial">Arial</option>
-          <option value="Times New Roman">Times New Roman</option>
-          <option value="Courier New">Courier New</option>
-          <option value="Verdana">Verdana</option>
-        </select>
-      </ToolTip>
-
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Select font" />
+          </SelectTrigger>
+          <SelectContent className="z-[110]">
+            <SelectItem value="Helvetica">Helvetica</SelectItem>
+            <SelectItem value="Arial">Arial</SelectItem>
+            <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+            <SelectItem value="Courier New">Courier New</SelectItem>
+            <SelectItem value="Verdana">Verdana</SelectItem>
+            <SelectItem value="Georgia">Georgia</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
       {/* Bold Button */}
-      <button
+      <Button
         onClick={() => {
           if (editableObject && editableObject instanceof fabric.Textbox) {
-            const newFontWeight = editableObject.fontWeight === "bold" ? "normal" : "bold";
-            editableObject.set("fontWeight", newFontWeight); // Update Fabric.js object
-            canvas?.renderAll(); // Render changes in Fabric.js
-
-            // Force React state update to reflect the change
-            // setEditableObject(
-            //   new fabric.Textbox(editableObject.text, {
-            //     ...editableObject,
-            //   })
-            // );
+            updateObjectProperty(
+              "fontWeight",
+              editableObject.fontWeight === "bold" ? "normal" : "bold"
+            );
           }
         }}
-        className={`p-1 rounded ${editableObject?.fontWeight === "bold" ? "bg-gray-300 font-bold" : ""}`}
+        size="icon"
+        variant={editableObject.fontWeight === "bold" ? "active" : "outline"}
       >
         B
-      </button>
-
-      {/* Italic Button */}
-      <button
+      </Button>
+      <Button
         onClick={() => {
-          if (editableObject && editableObject instanceof fabric.Textbox) {
-            const newFontStyle = editableObject.fontStyle === "italic" ? "normal" : "italic";
-            editableObject.set("fontStyle", newFontStyle); // Update fontStyle property
-            canvas?.renderAll(); // Render changes in Fabric.js
-
-            // Force React state update to reflect the change
-            // setEditableObject(
-            //   new fabric.Textbox(editableObject.text, {
-            //     ...editableObject,
-            //   })
-            // );
+          if (editableObject instanceof fabric.Textbox) {
+            updateObjectProperty(
+              "fontStyle",
+              editableObject.fontStyle === "italic" ? "normal" : "italic"
+            );
           }
         }}
-        className={`p-1 rounded ${editableObject?.fontStyle === "italic" ? "bg-gray-300" : ""}`}
+        size="icon"
+        variant={editableObject.fontStyle === "italic" ? "active" : "outline"}
       >
-        <i>I</i>
-      </button>
-
+        I
+      </Button>
       {/* Underline Button */}
-      <button
+      <Button
         onClick={() => {
           if (editableObject && editableObject instanceof fabric.Textbox) {
-            const newUnderline = !editableObject.underline;
-            editableObject.set("underline", newUnderline); // Update underline property
-            canvas?.renderAll(); // Render changes in Fabric.js
-
-            // Force React state update to reflect the change
-            // setEditableObject(
-            //   new fabric.Textbox(editableObject.text, {
-            //     ...editableObject,
-            //   })
-            // );
+            updateObjectProperty("underline", !editableObject.underline);
           }
         }}
-        className={`p-1 rounded ${editableObject?.underline ? "bg-gray-300" : ""}`}
+        size="icon"
+        variant={editableObject.underline === true ? "active" : "outline"}
       >
         <u>U</u>
-      </button>
+      </Button>
 
-      {/* Font Size */}
-      <input
+      <Input
         type="number"
-        value={editableObject.fontSize || 16} // Default value is 16 if fontSize is undefined
+        value={editableObject.fontSize} // Default value is 16 if fontSize is undefined
         onChange={(e) => {
-          const newFontSize = parseInt(e.target.value, 10);
-
-          // Update only if the value is a valid number and within the range
-          if (!isNaN(newFontSize) && newFontSize >= 10 && newFontSize <= 100) {
-            // Update font size directly in fabric Textbox object
-            editableObject.set("fontSize", newFontSize);
-
-            // Trigger continuous re-render of the canvas
-            canvas?.renderAll();
-          }
+          console.log(e.target.valueAsNumber);
+          updateObjectProperty("fontSize", e.target.value);
         }}
-        className="border p-1 w-16 rounded"
+        className="w-20"
         min="10"
         max="100"
       />
 
-      {/* Text Alignment */}
       <div className="flex border border-gray-400 rounded overflow-hidden">
         <button
-          onClick={() => updateObject({ textAlign: "left" })}
+          //   onClick={() => updateObject({ textAlign: "left" })}
           className={`px-3 py-1 border-r border-gray-400 ${editableObject?.textAlign === "left" ? "bg-gray-300 font-bold" : "bg-white hover:bg-gray-200"}`}
         >
           <FaAlignLeft size={16} />
         </button>
         <button
-          onClick={() => updateObject({ textAlign: "center" })}
+          //   onClick={() => updateObject({ textAlign: "center" })}
           className={`px-3 py-1 border-r border-gray-400 ${editableObject?.textAlign === "center" ? "bg-gray-300 font-bold" : "bg-white hover:bg-gray-200"}`}
         >
           <FaAlignCenter size={16} />
         </button>
         <button
-          onClick={() => updateObject({ textAlign: "right" })}
+          //   onClick={() => updateObject({ textAlign: "right" })}
           className={`px-3 py-1 ${editableObject?.textAlign === "right" ? "bg-gray-300 font-bold" : "bg-white hover:bg-gray-200"}`}
         >
           <FaAlignRight size={16} />
         </button>
       </div>
-
       {/* Text Color */}
       <ToolTip text="Text Color">
         <ColorPicker {...textColor} />
       </ToolTip>
-
       {/* Background Color */}
       <ToolTip text="Background Color">
         <ColorPicker {...backgroundColor} />
