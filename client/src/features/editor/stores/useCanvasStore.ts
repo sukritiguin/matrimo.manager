@@ -1,16 +1,24 @@
 import { create } from "zustand";
 import * as fabric from "fabric";
-import { getCanvasPresets } from "../utils";
+import {
+  Fabric_CIRCLE,
+  FABRIC_RECTANGLE,
+  FABRIC_TEXTBOX,
+  Fabric_TRIANGLE,
+  getCanvasPresets,
+} from "../utils";
 import { TCanvasPreset, TOrientation } from "../types";
 import {
   DEFAULT_BACKGROUND_COLOR,
   DEFAULT_ZOOM_LABEL,
+  elements,
   ExportFormat,
   INIITIAL_CANVAS_ORIENTATION,
   MAX_ZOOM_LABEL,
   MIN_ZOOM_LABEL,
   ZOOM_STEP,
 } from "../constants";
+import { CirCulerStack } from "../utils/stack";
 
 interface State {
   canvas: fabric.Canvas | null;
@@ -19,6 +27,7 @@ interface State {
   orientation: TOrientation;
   canvasPresets: TCanvasPreset[];
   selectedCanvasPreset: TCanvasPreset;
+  history: CirCulerStack<object>;
 }
 
 interface Actions {
@@ -33,9 +42,13 @@ interface Actions {
   setZoomLevel: (value: number) => void;
   resetZoom: () => void;
 
+  onAddElement: (elementId: (typeof elements)[number]["id"]) => void;
+
   exportCanvas: (format: (typeof ExportFormat)[number]) => void;
 
   reset: () => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 const INIITIAL_CANVAS_STORE: State = {
@@ -45,6 +58,7 @@ const INIITIAL_CANVAS_STORE: State = {
   orientation: INIITIAL_CANVAS_ORIENTATION, // Default orientation
   selectedCanvasPreset: getCanvasPresets(INIITIAL_CANVAS_ORIENTATION)[0],
   canvasPresets: getCanvasPresets(INIITIAL_CANVAS_ORIENTATION),
+  history: new CirCulerStack<fabric.Object[]>(24),
 };
 
 export const useCanvasStore = create<State & Actions>((set, get) => ({
@@ -63,12 +77,9 @@ export const useCanvasStore = create<State & Actions>((set, get) => ({
         width: width * 96,
         height: height * 96,
         backgroundColor: DEFAULT_BACKGROUND_COLOR,
-        selectionBorderColor: "#00ff",
       });
       canvas.setZoom(zoomLevel / 100);
-      const canvasContainerRef = document.getElementById(
-        "editorCanvasContainer"
-      ) as HTMLDivElement;
+      const canvasContainerRef = document.getElementById("editorCanvasContainer") as HTMLDivElement;
       if (!canvasContainerRef) {
         throw new Error("Can not find editor container");
       }
@@ -86,8 +97,7 @@ export const useCanvasStore = create<State & Actions>((set, get) => ({
 
   // Handle canvas resizing
   canvasResize: () => {
-    const { canvas, canvasContainerRef, selectedCanvasPreset, zoomLevel } =
-      get();
+    const { canvas, canvasContainerRef, selectedCanvasPreset, zoomLevel } = get();
     try {
       if (!canvas) throw new Error("Canvas not initialized");
       if (!canvasContainerRef) throw new Error("Canvas container not found");
@@ -128,8 +138,7 @@ export const useCanvasStore = create<State & Actions>((set, get) => ({
   toggleOrientation() {
     console.log("toggle orientation");
     const { orientation, selectedCanvasPreset, canvasResize } = get();
-    const toggleOrientation: TOrientation =
-      orientation === "Landscape" ? "Portrait" : "Landscape";
+    const toggleOrientation: TOrientation = orientation === "Landscape" ? "Portrait" : "Landscape";
     const newCanvasPresets = getCanvasPresets(toggleOrientation);
 
     const newSelectedCanvasPreser =
@@ -187,10 +196,7 @@ export const useCanvasStore = create<State & Actions>((set, get) => ({
       console.error("Invalid zoom value:", value);
       return;
     }
-    newZoomLevel = Math.min(
-      Math.max(newZoomLevel, MIN_ZOOM_LABEL),
-      MAX_ZOOM_LABEL
-    );
+    newZoomLevel = Math.min(Math.max(newZoomLevel, MIN_ZOOM_LABEL), MAX_ZOOM_LABEL);
 
     set({ zoomLevel: newZoomLevel });
 
@@ -214,11 +220,13 @@ export const useCanvasStore = create<State & Actions>((set, get) => ({
 
   exportCanvas: (format) => {
     const { canvas } = get();
+
     if (!canvas) {
       console.error("Canvas is not initialized");
       return;
     }
 
+    get().resetZoom();
     if (format === "png") {
       const dataURL = canvas.toDataURL({
         format,
@@ -233,6 +241,80 @@ export const useCanvasStore = create<State & Actions>((set, get) => ({
       link.click();
       console.log("Canvas exported as PNG");
       document.body.removeChild(link);
+    }
+  },
+
+  onAddElement: (elementId) => {
+    console.log(`Adding element: ${elementId}`);
+    const { canvas } = get();
+    if (!canvas) return;
+
+    let element: fabric.Object | null = null;
+    switch (elementId) {
+      case "text":
+        element = FABRIC_TEXTBOX("Text");
+        break;
+      case "rectangle":
+        element = FABRIC_RECTANGLE;
+        break;
+      case "circle":
+        element = Fabric_CIRCLE;
+        break;
+      case "triangle":
+        element = Fabric_TRIANGLE;
+        break;
+      case "image":
+        {
+          const addImageInput = document.getElementById("addImage") as HTMLInputElement;
+          if (addImageInput) {
+            console.log("Opening file picker...");
+            addImageInput.click();
+          } else {
+            console.error("File input #addImage not found!");
+          }
+        }
+        break;
+      default:
+        console.error(`Unsupported element: ${elementId}`);
+        break;
+    }
+
+    if (element !== null) {
+      canvas.add(element);
+      canvas.setActiveObject(element);
+      canvas.requestRenderAll();
+
+      const objects = canvas.getObjects();
+      get().history.push(objects);
+
+      console.log("Element added successfully", element);
+    }
+  },
+
+  undo: () => {
+    const { canvas, history } = get();
+    const undoState = history.undo();
+    if (undoState && canvas) {
+      console.log("Undo state", undoState);
+      const currentObjects = canvas.getObjects();
+      get().canvasResize();
+    } else {
+      console.log("No more undo states available");
+    }
+  },
+
+  redo: () => {
+    const { canvas, history } = get();
+    const redoState = history.redo();
+    if (redoState && canvas) {
+      canvas.clear();
+      canvas.set({ backgroundColor: DEFAULT_BACKGROUND_COLOR });
+
+      console.log("Redo state", redoState);
+
+      get().canvasResize();
+    } else {
+      console.log("No more redo states available");
     }
   },
 

@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
@@ -8,57 +9,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { elements, templates } from "../constants";
-import React, { useState } from "react";
-import { useCanvasStore } from "../stores/useCanvasStore";
-import {
-  Fabric_CIRCLE,
-  FABRIC_RECTANGLE,
-  FABRIC_TEXTBOX,
-  Fabric_TRIANGLE,
-} from "../utils";
 
-export const LeftSidebar = () => {
-  const { canvas } = useCanvasStore();
+import { elements, templates } from "../constants";
+import { useInsertObject } from "../hooks/useInsertObject";
+
+export const LeftSidebar: React.FC = () => {
+  const { onAddObject, handleChangeImage } = useInsertObject();
+
   const [activeTab, setActiveTab] = useState("elements");
 
-  const handleAddElement = (elementId: (typeof elements)[number]["id"]) => {
-    // if (canvas) {  }
-    // In a real implementation, we would add the element to the canvas
-    console.log(`Adding element: ${elementId}`);
-    if (!canvas) return;
-
-    if (elementId === "text") {
-      const text = FABRIC_TEXTBOX("Text");
-      canvas.add(text);
-      canvas.setActiveObject(text);
-    } else if (elementId === "rectangle") {
-      canvas.add(FABRIC_RECTANGLE);
-      canvas.setActiveObject(FABRIC_RECTANGLE);
-    } else if (elementId === "circle") {
-      canvas.add(Fabric_CIRCLE);
-      canvas.setActiveObject(Fabric_CIRCLE);
-    } else if (elementId === "triangle") {
-      canvas.add(Fabric_TRIANGLE);
-      canvas.setActiveObject(Fabric_TRIANGLE);
-    } else if (elementId === "image") {
-      //   TODO: Implement
-    }
-  };
-
-  const handleTemplateSelect = (
-    templateId: (typeof templates)[number]["id"]
-  ) => {
+  const handleTemplateSelect = (templateId: (typeof templates)[number]["id"]) => {
     // In a real implementation, we would load the template into the canvas
   };
 
   return (
     <div className="w-xs border-r max-h-[100%-64px] overflow-y-scroll">
-      <Tabs
-        defaultValue="templates"
-        value={activeTab}
-        onValueChange={setActiveTab}
-      >
+      <Tabs defaultValue="templates" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="w-full">
           <TabsTrigger value="elements" className="flex-1">
             Elements
@@ -67,16 +33,20 @@ export const LeftSidebar = () => {
             Templates
           </TabsTrigger>
         </TabsList>
-        <ElementsTabContent
-          elements={elements}
-          onAddElement={handleAddElement}
-        />
+        <ElementsTabContent elements={elements} onAddElement={onAddObject} />
 
         {/* <TemplatesTabContent
           templates={templates}
           onTemplatesSelect={handleTemplateSelect}
         /> */}
       </Tabs>
+      <input
+        type="file"
+        id="addImage"
+        className="hidden"
+        accept="image/*"
+        onChange={handleChangeImage}
+      />
     </div>
   );
 };
@@ -120,7 +90,6 @@ const ElementsTabContent: React.FC<{
             </Card>
           ))}
         </div>
-        <input id="addImage" type="image" hidden />
       </div>
     </TabsContent>
   );

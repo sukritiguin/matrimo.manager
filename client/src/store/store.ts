@@ -1,11 +1,14 @@
-import { create } from "zustand";
+import { configureStore } from "@reduxjs/toolkit";
+import canvasReducer from "@/features/editor/stores/canvasSlice";
 
-interface StoreState {
-  count: number;
-  increment: () => void;
-}
+const store = configureStore({
+  reducer: {
+    canvas: canvasReducer,
+  },
+});
 
-export const useStore = create<StoreState>((set) => ({
-  count: 0,
-  increment: () => set((state) => ({ count: state.count + 1 })),
-}));
+export type RootState = ReturnType<typeof store.getState>;
+
+export type AppDispatch = typeof store.dispatch;
+
+export default store;
