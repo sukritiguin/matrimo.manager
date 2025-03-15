@@ -1,21 +1,30 @@
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import { useEditObject } from "../hooks/useEditObject";
-
-import * as fabric from "fabric";
 import { ToolbarPopover } from "./ToolbarPopover";
 import { useCanvasStore } from "../stores/useCanvasStore";
 
 export const Toolbar = () => {
   const { canvas, initCanvas } = useCanvasStore();
-  const { textColor, backgroundColor, borderColor, editableObject, deleteObject } = useEditObject();
+  const {
+    textColor,
+    backgroundColor,
+    borderColor,
+    selectedObjects,
+    editableObject,
+    updateObjectProperty,
+    deleteObject,
+  } = useEditObject();
 
-  const updateTextbox = (newProps: Partial<fabric.Textbox>) => {
+  const updateObject = (newProps: Record<string, any>) => {
     if (!canvas || !editableObject) return;
 
-    console.log(newProps);
-    editableObject.set(newProps);
-    canvas.renderAll();
+    console.log("New Props while editing: ", newProps);
+
+    // Update the object with the new properties
+    Object.keys(newProps).forEach((key) => {
+      updateObjectProperty(key, newProps[key]);
+    });
   };
 
   return (
@@ -39,13 +48,13 @@ export const Toolbar = () => {
         >
           <div className="flex space-x-3 items-center justify-center">
             <ToolbarPopover
-              backgroundColor={backgroundColor}
-              canvas={canvas}
-              editableObject={editableObject}
-              textColor={textColor}
-              updateTextbox={updateTextbox}
-              borderColor={borderColor}
-              deleteObject={deleteObject}
+              backgroundColor={backgroundColor} // Updated to use backgroundColor
+              textColor={textColor} // Updated to use textColor
+              borderColor={borderColor} // Border color for objects
+              updateObject={updateObject} // Unified object update function
+              deleteObject={deleteObject} // Delete selected objects from canvas
+              canvas={canvas} // Pass canvas here
+              editableObject={editableObject} // Pass editableObject here
             />
           </div>
         </motion.div>

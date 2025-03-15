@@ -80,6 +80,9 @@ export const useEditObject = () => {
   // Color Pickers (Common for all objects)
   const textColor = useColorPicker("#000000", (color) => updateObjectProperty("fill", color));
   const borderColor = useColorPicker("#000000", (color) => updateObjectProperty("stroke", color));
+  const backgroundColor = useColorPicker("#fff", (color) =>
+    updateObjectProperty("backgroundColor", color)
+  );
 
   // Delete Object
   const deleteObject = () => {
@@ -117,6 +120,7 @@ export const useEditObject = () => {
   return {
     textColor,
     borderColor,
+    backgroundColor,
     selectedObjects,
     editableObject,
     updateObjectProperty, // Centralized property updater

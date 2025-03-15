@@ -77,20 +77,20 @@ const ElementBorder: React.FC<{
 
 export const ToolbarPopover = ({
   editableObject,
-  updateTextbox,
   canvas,
   textColor,
   backgroundColor,
   borderColor,
   deleteObject,
+  updateObject,
 }: {
   editableObject: any;
-  updateTextbox: any;
   canvas: any;
   textColor: any;
   backgroundColor: any;
   borderColor: any;
   deleteObject: any;
+  updateObject: (newProps: Record<string, any>) => void;
 }) => {
   return (
     <div className="flex flex-wrap gap-2 items-center">
@@ -115,16 +115,28 @@ export const ToolbarPopover = ({
           <Trash2 className="size-6 text-destructive" />
         </button>
       </ToolTip>
-      <select
-        value={editableObject.fontFamily || "Arial"}
-        onChange={(e) => updateTextbox({ fontFamily: e.target.value })}
-        className="border p-1 rounded"
-      >
-        <option value="Arial">Arial</option>
-        <option value="Times New Roman">Times New Roman</option>
-        <option value="Courier New">Courier New</option>
-        <option value="Verdana">Verdana</option>
-      </select>
+
+      <ToolTip text="Font Family" className="flex items-center">
+        <select
+          value={editableObject.fontFamily} // Bind the selected value to the editableObject's fontFamily
+          onChange={(e) => {
+            const newFontFamily = e.target.value;
+            console.log("Selected font family:", newFontFamily);
+
+            // Update the fontFamily of the editableObject (Fabric.js Textbox)
+            editableObject.set("fontFamily", newFontFamily);
+
+            // Re-render the canvas to apply the changes
+            canvas?.renderAll();
+          }}
+          className="border p-1 rounded"
+        >
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+      </ToolTip>
 
       {/* Bold Button */}
       <button
@@ -213,19 +225,19 @@ export const ToolbarPopover = ({
       {/* Text Alignment */}
       <div className="flex border border-gray-400 rounded overflow-hidden">
         <button
-          onClick={() => updateTextbox({ textAlign: "left" })}
+          onClick={() => updateObject({ textAlign: "left" })}
           className={`px-3 py-1 border-r border-gray-400 ${editableObject?.textAlign === "left" ? "bg-gray-300 font-bold" : "bg-white hover:bg-gray-200"}`}
         >
           <FaAlignLeft size={16} />
         </button>
         <button
-          onClick={() => updateTextbox({ textAlign: "center" })}
+          onClick={() => updateObject({ textAlign: "center" })}
           className={`px-3 py-1 border-r border-gray-400 ${editableObject?.textAlign === "center" ? "bg-gray-300 font-bold" : "bg-white hover:bg-gray-200"}`}
         >
           <FaAlignCenter size={16} />
         </button>
         <button
-          onClick={() => updateTextbox({ textAlign: "right" })}
+          onClick={() => updateObject({ textAlign: "right" })}
           className={`px-3 py-1 ${editableObject?.textAlign === "right" ? "bg-gray-300 font-bold" : "bg-white hover:bg-gray-200"}`}
         >
           <FaAlignRight size={16} />
