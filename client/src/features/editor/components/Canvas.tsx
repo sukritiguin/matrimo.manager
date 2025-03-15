@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useCanvasStore } from "../stores/useCanvasStore";
 import * as fabric from "fabric";
 import { useColorPicker } from "@/hooks/useColorPicker";
-import { ColorPicker } from "@/components/color-picker";
-import { ToolTip } from "@/components/common/tooltip";
 import { DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR } from "../constants";
+import { ToolbarPopover } from "./ToolbarPopover";
 
 export const Canvas: React.FC = () => {
   const { canvas, initCanvas } = useCanvasStore();
@@ -15,7 +14,7 @@ export const Canvas: React.FC = () => {
   const borderColor = useColorPicker(DEFAULT_BORDER_COLOR);
 
   const [selectedObjects, setSelectedObjects] = useState<fabric.Object[]>([]);
-  const [editableObject, setEditableObject] = useState<fabric.Object | null>(
+  const [editableObject, setEditableObject] = useState<fabric.Textbox | null>(
     null
   );
 
@@ -31,13 +30,21 @@ export const Canvas: React.FC = () => {
     const handleSelectionCreated = (e: any) => {
       const selected = e.selected || [];
       setSelectedObjects(selected);
-      setEditableObject(selected[0] || null);
+      setEditableObject(
+        selected[0] && selected[0].type === "textbox"
+          ? (selected[0] as fabric.Textbox)
+          : null
+      );
     };
 
     const handleSelectionUpdated = (e: any) => {
       const selected = e.selected || [];
       setSelectedObjects(selected);
-      setEditableObject(selected[0] || null);
+      setEditableObject(
+        selected[0] && selected[0].type === "textbox"
+          ? (selected[0] as fabric.Textbox)
+          : null
+      );
     };
 
     const handleSelectionCleared = () => {
@@ -48,7 +55,7 @@ export const Canvas: React.FC = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!canvas) return;
 
-      if (event.key === "Delete" || event.key === "Backspace") {
+      if (event.key === "Delete") {
         if (selectedObjects.length > 0) {
           selectedObjects.forEach((obj) => canvas.remove(obj));
           setSelectedObjects([]);
@@ -76,12 +83,11 @@ export const Canvas: React.FC = () => {
   useEffect(() => {
     if (!canvas || !editableObject) return;
 
-    if (editableObject.type === "textbox") {
-      editableObject.set("fill", textColor.color);
-    } else {
-      editableObject.set("fill", backgroundColor.color);
-      editableObject.set("stroke", borderColor.color);
-    }
+    editableObject.set({
+      fill: textColor.color,
+      backgroundColor: backgroundColor.color,
+      stroke: borderColor.color,
+    });
 
     canvas.renderAll();
   }, [
@@ -92,28 +98,40 @@ export const Canvas: React.FC = () => {
     borderColor.color,
   ]);
 
+  // Function to update text properties
+  const updateTextbox = (newProps: Partial<fabric.Textbox>) => {
+    if (!canvas || !editableObject) return;
+
+    console.log(newProps);
+    editableObject.set(newProps);
+    canvas.renderAll();
+  };
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="py-1 w-full flex items-center justify-center px-4 absolute">
         <div
-          className={`flex items-center bg-card ring px-4 py-1 rounded-2xl transition-all duration-500 ${editableObject ? "opacity-100" : "opacity-0"}`}
+          className={`flex items-center bg-card ring px-4 py-1 rounded-2xl transition-all duration-500 ${
+            editableObject ? "opacity-100" : "opacity-0"
+          }`}
         >
-          {editableObject?.type === "textbox" && (
-            <ToolTip text="Text color">
-              <ColorPicker
-                {...textColor}
-                defaultColor={editableObject.backgroundColor}
-              />
-            </ToolTip>
-          )}
-          {editableObject?.type !== "textbox" && (
+          {editableObject ? (
+            <ToolbarPopover
+              backgroundColor={backgroundColor}
+              canvas={canvas}
+              editableObject={editableObject}
+              textColor={textColor}
+              updateTextbox={updateTextbox}
+            />
+          ) : (
             <div className="flex gap-2">
-              <ColorPicker {...backgroundColor} />
-              <ColorPicker {...borderColor} />
+              {/* <ColorPicker {...backgroundColor} />
+              <ColorPicker {...borderColor} /> */}
             </div>
           )}
         </div>
       </div>
+
       <div className="flex flex-1 w-full justify-center items-center h-full overflow-auto bg-muted">
         <div
           id="editorCanvasContainer"
