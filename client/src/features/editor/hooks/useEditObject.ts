@@ -58,13 +58,10 @@ export const AllowedProperties = {
 export const useEditObject = () => {
   const { canvas } = useCanvasContext();
   const [selectedObjects, setSelectedObjects] = React.useState<fabric.Object[]>([]);
-  const [editableObject, setEditableObject] = React.useState<any>(null);
+  const [editableObject, setEditableObject] = React.useState<fabric.Object | null>(null);
 
   // Universal update function based on object type
-  const updateObjectProperty = <T extends keyof typeof AllowedProperties>(
-    property: (typeof AllowedProperties)[T][number],
-    value: any
-  ) => {
+  const updateObjectProperty = (property: string, value: any) => {
     if (!canvas || !editableObject) return;
 
     if (property in editableObject) {
