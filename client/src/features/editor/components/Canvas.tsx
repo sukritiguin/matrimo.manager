@@ -1,12 +1,14 @@
 import { useCanvas } from "../hooks/useCanvas";
+import { useEditObject } from "../hooks/useEditObject";
 import { Toolbar } from "./Toolbar";
 
 export const Canvas: React.FC = () => {
   const { canvasContainerRef, canvasRef } = useCanvas();
+  const editObject = useEditObject();
 
   return (
     <div className="flex flex-col w-full h-full">
-      <Toolbar />
+      <Toolbar {...editObject} />
       <div className="flex flex-1 w-full justify-center items-center h-full overflow-auto bg-muted">
         <div
           ref={canvasContainerRef}
