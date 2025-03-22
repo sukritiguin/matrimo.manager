@@ -1,10 +1,12 @@
 import { useCanvas } from "../hooks/useCanvas";
 import { useEditObject } from "../hooks/useEditObject";
+import { useInsertObject } from "../hooks/useInsertObject";
 import { Toolbar } from "./Toolbar";
 
 export const Canvas: React.FC = () => {
   const { canvasContainerRef, canvasRef } = useCanvas();
   const editObject = useEditObject();
+  const { handleDrop } = useInsertObject();
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -13,6 +15,7 @@ export const Canvas: React.FC = () => {
         <div
           ref={canvasContainerRef}
           className="w-full border border-muted shadow-xl overflow-hidden"
+          onDrop={handleDrop}
         >
           <canvas ref={canvasRef} />
         </div>

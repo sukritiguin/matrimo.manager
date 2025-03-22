@@ -1,27 +1,21 @@
 "use client";
 
-import {
-  Canvas,
-  CanvasButtonToolbar,
-  CanvasToolbar,
-  EditorHeader,
-  LeftSidebar,
-  RightSidebar,
-} from "../components";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { Canvas, CanvasToolbar, EditorHeader, LeftSidebar } from "../components";
 import { CanvasProvider } from "../components/CanvasProvider";
 
 function EditorPageWrapper() {
   return (
-    <div className="flex flex-col w-full h-screen max-h-screen bg-background">
-      <EditorHeader />
-      <div className="flex w-full flex-1 overflow-hidden">
-        <LeftSidebar />
+    <SidebarProvider>
+      <LeftSidebar />
+      <div className="flex flex-col w-full flex-1 overflow-hidden">
+        <EditorHeader />
+        <CanvasToolbar />
         <div className="flex-1 w-full flex flex-col justify-between overflow-hidden">
-          <CanvasToolbar />
           <Canvas />
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
 

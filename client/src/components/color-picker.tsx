@@ -20,9 +20,7 @@ export const ColorPicker: React.FC<{
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       {children ? (
-        <PopoverTrigger>
-          <React.Fragment>{children}</React.Fragment>
-        </PopoverTrigger>
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
       ) : (
         <PopoverTrigger asChild className="">
           <div className={cn(className, "flex items-center")}>

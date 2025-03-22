@@ -13,6 +13,9 @@ export const ExportFormat = ["png", "jpeg", "json"] as const;
 
 export const Orientation = ["Landscape", "Portrait"] as const;
 
+export * from "./text-templates";
+export * from "./shapes-elements";
+
 export const templates = [
   {
     id: "wedding1",

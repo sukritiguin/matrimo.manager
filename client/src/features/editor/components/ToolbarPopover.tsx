@@ -164,7 +164,6 @@ const TextboxTools: React.FC<{
           value={object.textAlign}
           onValueChange={(value) => value && updateProperty("textAlign", value)}
           variant="outline"
-          //   className="flex border border-gray-400 rounded overflow-hidden"
         >
           <ToggleGroupItem value="left">
             <AlignLeft className="size-4" />
