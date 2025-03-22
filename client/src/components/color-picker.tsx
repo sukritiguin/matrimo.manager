@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { HexColorPicker } from "react-colorful";
 import { Label } from "./ui/label";
+import { Button } from "./ui/button";
 
 export const ColorPicker: React.FC<{
   defaultColor?: string;
@@ -16,7 +17,17 @@ export const ColorPicker: React.FC<{
   label?: string;
   children?: React.ReactNode;
   asChild?: boolean;
-}> = ({ defaultColor, isOpen, setIsOpen, color, setColor, title, label, className, children }) => {
+}> = ({
+  defaultColor = "#000",
+  isOpen,
+  setIsOpen,
+  color,
+  setColor,
+  title,
+  label,
+  className,
+  children,
+}) => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       {children ? (
@@ -25,17 +36,21 @@ export const ColorPicker: React.FC<{
         <PopoverTrigger asChild className="">
           <div className={cn(className, "flex items-center")}>
             {title && <span className="mr-2">{title}</span>}
-            <button
-              style={{ background: color }}
+            <Button
+              size="icon"
+              variant="outline"
+              style={{ background: color || "transparent" }}
               className="size-6 rounded-full border-muted"
-            ></button>
+            >
+              <div className="size-4 rounded-full" />
+            </Button>
           </div>
         </PopoverTrigger>
       )}
       <PopoverContent className="w-60 px-4 space-y-3">
         <Label className="text-sm">{label}</Label>
         <HexColorPicker defaultValue={defaultColor || color} color={color} onChange={setColor} />
-        <Input className="mt-2" value={color} onChange={(e) => setColor(e.target.value)} />
+        <Input className="mt-2" value={color || ""} onChange={(e) => setColor(e.target.value)} />
       </PopoverContent>
     </Popover>
   );

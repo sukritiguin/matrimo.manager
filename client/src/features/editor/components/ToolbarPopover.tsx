@@ -73,6 +73,9 @@ const TextboxTools: React.FC<{
   const textColor = useColorPicker(object.fill as string, (color) => {
     updateProperty("fill", color);
   });
+  const backgroundColor = useColorPicker(object.backgroundColor as string, (color) => {
+    updateProperty("backgroundColor", color);
+  });
 
   const handleToggleFontStyle = (values: string[]) => {
     updateProperty("fontWeight", values.includes("bold") ? "bold" : "normal");
@@ -81,11 +84,20 @@ const TextboxTools: React.FC<{
   };
 
   useEffect(() => {
-    textColor.setColor(object.fill as string);
-  }, [object.fill]);
+    console.log(object.fill);
+    if (object.fill) textColor.setColor(object.fill as string);
+    if (object.backgroundColor) backgroundColor.setColor(object.backgroundColor as string);
+  }, [object.fill, object.backgroundColor]);
 
   return (
     <React.Fragment>
+      {/* Background */}
+      <ToolTip text="Background Color">
+        <div className="flex p-1 rounded-md bg-muted border">
+          <ColorPicker {...backgroundColor} />
+        </div>
+      </ToolTip>
+
       {/* Text Color */}
       <ToolTip text="Font Color">
         <ColorPicker {...textColor}>
@@ -208,7 +220,7 @@ const ElementBorder = ({
     },
   ] as const;
 
-  const borderColor = useColorPicker(object.stroke as string, (color) => {
+  const borderColor = useColorPicker((object.stroke as string) || "#fff", (color) => {
     updateObjectProperty("stroke", color);
   });
 
@@ -247,7 +259,9 @@ const ElementBorder = ({
   };
 
   useEffect(() => {
-    borderColor.setColor(object.stroke as string);
+    if (object.stroke !== null) {
+      borderColor.setColor(object.stroke as string);
+    }
   }, [object.stroke]);
 
   return (
