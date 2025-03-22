@@ -1,17 +1,11 @@
 import * as fabric from "fabric";
-import { DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR, elements } from "../constants";
+import { DEFAULT_BORDER_COLOR, ShapeElement, TextTemplate } from "../constants";
 import { useCanvasContext } from "./useCanvasContext";
-import { ChangeEvent } from "react";
-
-const DEFAULT_OPTIONS_INSERT_OBJECT = {
-  left: 100,
-  top: 100,
-  fill: DEFAULT_BACKGROUND_COLOR,
-  stroke: DEFAULT_BORDER_COLOR,
-};
+import { ChangeEvent, useCallback } from "react";
+import { debounce } from "lodash";
 
 export const useInsertObject = () => {
-  const { canvas } = useCanvasContext();
+  const { canvas, canvasContainerRef } = useCanvasContext();
 
   const handleChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -31,78 +25,146 @@ export const useInsertObject = () => {
     reader.readAsDataURL(file);
   };
 
-  const onAddObject = (elementId: (typeof elements)[number]["id"]) => {
-    if (!canvas) {
-      console.error("Canvas not found!");
-      return;
-    }
+  const onAddText = useCallback(
+    (data: TextTemplate, left = 50, top = 50) => {
+      if (!canvas) {
+        console.error("Canvas not found!");
+        return;
+      }
 
-    let element: fabric.Object | null = null;
-    switch (elementId) {
-      case "text":
-        element = new fabric.Textbox("Text", {
-          width: 200,
-          height: 100,
-          fontSize: 24,
-          fontFamily: "Helvetica",
-          ...DEFAULT_OPTIONS_INSERT_OBJECT,
-          fill: "#333",
-        });
-        break;
-      case "rectangle":
-        element = new fabric.Rect({
-          width: 100,
-          height: 100,
-          transparentCorners: false,
-          hasBorders: true,
-          borderColor: DEFAULT_BORDER_COLOR,
-          ...DEFAULT_OPTIONS_INSERT_OBJECT,
-        });
-        break;
-      case "circle":
-        element = new fabric.Circle({
-          radius: 50,
-          ...DEFAULT_OPTIONS_INSERT_OBJECT,
-        });
-        break;
-      case "triangle":
-        element = new fabric.Triangle({
-          width: 100,
-          height: 100,
-          originX: "center",
-          originY: "center",
-          ...DEFAULT_OPTIONS_INSERT_OBJECT,
-        });
-        break;
-      case "image":
-        {
-          const addImageInput = document.getElementById("addImage") as HTMLInputElement;
-          if (addImageInput) {
-            console.log("Opening file picker...");
-            addImageInput.click();
-          } else {
-            console.error("File input #addImage not found!");
-          }
+      const newText = new fabric.Textbox(data.preview, {
+        left,
+        top,
+        ...data.options,
+      });
+
+      canvas.add(newText);
+      canvas.setActiveObject(newText);
+      newText.canvas?.renderAll();
+
+      console.log("Text added successfully", newText);
+    },
+    [canvas]
+  );
+
+  const onAddElement = useCallback(
+    (element: ShapeElement, left = 50, top = 50) => {
+      if (!canvas) {
+        console.error("Canvas not found!");
+        return;
+      }
+
+      let newElement: fabric.Object | null = null;
+      switch (element.type) {
+        case "rect":
+          newElement = new fabric.Rect({
+            width: 100,
+            height: 100,
+            borderColor: DEFAULT_BORDER_COLOR,
+          });
+          break;
+        case "circle":
+          newElement = new fabric.Circle({
+            radius: 50,
+          });
+          break;
+        case "triangle":
+          newElement = new fabric.Triangle({
+            width: 100,
+            height: 100,
+            originX: "center",
+            originY: "center",
+          });
+          break;
+        case "line":
+          newElement = new fabric.Line([50, 100, 250, 100], {
+            stroke: DEFAULT_BORDER_COLOR,
+            strokeWidth: 2,
+          });
+          break;
+        case "star":
+          newElement = new fabric.Polygon([
+            { x: 50, y: 0 },
+            { x: 61, y: 35 },
+            { x: 98, y: 35 },
+            { x: 68, y: 57 },
+            { x: 79, y: 91 },
+            { x: 50, y: 70 },
+            { x: 21, y: 91 },
+            { x: 32, y: 57 },
+            { x: 2, y: 35 },
+            { x: 39, y: 35 },
+          ]);
+          break;
+        default:
+          console.error(`Unsupported element: ${element.name}`);
+          break;
+      }
+
+      if (newElement) {
+        newElement.set("left", left);
+        newElement.set("top", top);
+        canvas.add(newElement);
+        canvas.setActiveObject(newElement);
+        newElement.canvas?.requestRenderAll();
+
+        console.log("Element added successfully", newElement);
+      }
+    },
+    [canvas]
+  );
+
+  const handleDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const clientX = event.clientX - canvasContainerRef.current!.offsetLeft;
+      const clientY = event.clientY - canvasContainerRef.current!.offsetTop;
+
+      if (event.dataTransfer) {
+        const { type, data } = JSON.parse(event?.dataTransfer?.getData("text/plain"));
+        console.log("Dropped:", type, data);
+
+        // text, uploads, elements, photos
+        switch (type) {
+          case "text":
+            onAddText(data as TextTemplate, clientX, clientY);
+            break;
+          case "element":
+            onAddElement(data as ShapeElement, clientX, clientY);
+            break;
+          case "uploads":
+            console.log(type, data);
+            break;
+          default:
+            console.error(`Unsupported element: ${type}`);
+            break;
         }
+      }
+    },
+    [canvasContainerRef, onAddText, onAddElement]
+  );
+
+  const handleClickToInsert = debounce((type: string, data: any) => {
+    switch (type) {
+      case "text":
+        onAddText(data as TextTemplate);
+        break;
+      case "element":
+        onAddElement(data as ShapeElement);
+        break;
+      case "uploads":
+        console.log(type, data);
         break;
       default:
-        console.error(`Unsupported element: ${elementId}`);
+        console.error(`Unsupported element: ${type}`);
         break;
     }
-
-    if (element) {
-      canvas.add(element);
-      canvas.setActiveObject(element);
-      canvas.requestRenderAll();
-
-      const jsonData = canvas.toJSON();
-
-      console.log("Element added successfully", element);
-    }
-  };
+  }, 200);
 
   return {
-    onAddObject,
     handleChangeImage,
+    handleDrop,
+    handleClickToInsert,
   };
 };

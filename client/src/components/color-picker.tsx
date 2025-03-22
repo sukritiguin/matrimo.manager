@@ -14,26 +14,15 @@ export const ColorPicker: React.FC<{
   className?: string;
   title?: string;
   label?: string;
-  child?: React.ReactNode;
+  children?: React.ReactNode;
   asChild?: boolean;
-}> = ({
-  defaultColor,
-  isOpen,
-  setIsOpen,
-  color,
-  setColor,
-  title,
-  label,
-  className,
-  child,
-  asChild,
-}) => {
+}> = ({ defaultColor, isOpen, setIsOpen, color, setColor, title, label, className, children }) => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild className="">
-        {asChild ? (
-          <React.Fragment>{child}</React.Fragment>
-        ) : (
+      {children ? (
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
+      ) : (
+        <PopoverTrigger asChild className="">
           <div className={cn(className, "flex items-center")}>
             {title && <span className="mr-2">{title}</span>}
             <button
@@ -41,8 +30,8 @@ export const ColorPicker: React.FC<{
               className="size-6 rounded-full border-muted"
             ></button>
           </div>
-        )}
-      </PopoverTrigger>
+        </PopoverTrigger>
+      )}
       <PopoverContent className="w-60 px-4 space-y-3">
         <Label className="text-sm">{label}</Label>
         <HexColorPicker defaultValue={defaultColor || color} color={color} onChange={setColor} />
