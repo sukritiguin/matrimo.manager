@@ -2,6 +2,7 @@ model UploadImage {
     id        String   @id @default(uuid())
     url       String
     filename  String
+    fileKey   String
     mimetype  String
     size      Int
     user      User     @relation(fields: [userId], references: [id])

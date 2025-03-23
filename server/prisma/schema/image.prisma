@@ -2,6 +2,7 @@ model Image {
     id        Int      @id @default(autoincrement())
     url       String
     filename  String
+    fileKey   String
     mimetype  String
     size      Int
     createdAt DateTime @default(now())
