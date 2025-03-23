@@ -11,12 +11,11 @@
     "dev:client": "cd client && npm run dev",
     "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"cd client && npm run dev\" \"cd server && npm run dev\"",
     "format": "prettier --write \"**/*.{ts,tsx,css,html}\"",
-    "prepare": "husky && husky install",
     "db:dev:up": "docker compose up matrimo-db -d",
     "db:dev:stop": "docker compose stop matrimo-db"
   },
   "lint-staged": {
-    "**/*.{ts,tsx,css,html,prisma}": "prettier --write"
+    "**/*.{ts,tsx,css,html}": "prettier --write"
   },
   "repository": {
     "type": "git",
@@ -29,6 +28,7 @@
   },
   "homepage": "https://github.com/sukritiguin/matrimo.manager#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.772.0",
     "@reduxjs/toolkit": "^2.6.1",
     "concurrently": "^9.1.2",
     "prettier": "^3.5.1",

@@ -5,6 +5,7 @@ model Editor {
     tags    String[]
     data    Json
 
+    isArchive Boolean @default(false)
     shareLink String?
     imageId   Int?
     image     Image?  @relation(fields: [imageId], references: [id], onDelete: Cascade)
