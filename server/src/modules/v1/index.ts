@@ -11,5 +11,5 @@ export const v1Routers = (route: FastifyInstance) => {
   route.register(authRoutes, { prefix: "/auth" });
   route.register(userRoutes, { prefix: "/users" });
 
-  route.register(editorRoutes, { prefix: "/editor" });
+  route.register(editorRoutes, { prefix: "/editors" });
 };

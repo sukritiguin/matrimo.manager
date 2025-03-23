@@ -10,9 +10,9 @@ export const editorRoutes = (route: FastifyInstance) => {
   route.patch("/:editorId", editorService.updateEditor);
   route.delete("/:editorId", editorService.deleteEditor);
 
-  route.get("/:editorId/rename", editorService.renameEditor);
-  route.get("/:editorId/download", editorService.downloadEditor);
-  route.get("/:editorId/share", editorService.shareEditor);
+  route.post("/:editorId/rename", editorService.renameEditor);
+  route.post("/:editorId/download", editorService.downloadEditor);
+  route.post("/:editorId/share", editorService.shareEditor);
 
   route.get("/archives", editorService.getAllArchives);
   route.get("/archives/:editorId", editorService.getArchiveByEditorId);
