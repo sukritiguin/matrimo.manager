@@ -1,72 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Button } from "./../ui/button";
 import { Menu, X } from "lucide-react";
 import { UserButton } from "./user-button";
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`fixed top-0 left-0 w-full z-50 transition-all ${
-        isScrolled ? "bg-white shadow-md" : "bg-transparent"
-      }`}
-    >
+    <nav className={`w-full max-w-7xl z-50 transition-all`}>
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <Link
-          to="/"
-          className={`text-2xl font-bold  ${
-            isScrolled ? "text-[var(--primary-maroon)]" : "text-white"
-          }`}
-        >
+        <Link to="/" className={`text-2xl font-bold capitalize roboto-slab`}>
           Invitaria
         </Link>
 
         {/* Desktop Menu */}
-        <div
-          className={`hidden md:flex space-x-8 ${isScrolled ? "text-black" : "text-amber-100"}`}
-        >
+        <div className={`hidden md:flex space-x-8`}>
           <Link
             to="/"
-            className={`hover:${!isScrolled ? "text-white" : "text-[var(--primary-maroon)]"} transition`}
+            className="font-semibold text-sm opacity-100 hover:text-muted-foreground transition-all duration-200 delay-100"
           >
             Home
           </Link>
           <Link
             to="/about"
-            className={`hover:${!isScrolled ? "text-white" : "text-[var(--primary-maroon)]"} transition`}
+            className="font-semibold text-sm opacity-100 hover:text-muted-foreground transition-all duration-200 delay-100"
           >
             About
           </Link>
           <Link
             to="/features"
-            className={`hover:${!isScrolled ? "text-white" : "text-[var(--primary-maroon)]"} transition`}
+            className="font-semibold text-sm opacity-100 hover:text-muted-foreground transition-all duration-200 delay-100"
           >
             Features
           </Link>
           <Link
             to="/pricing"
-            className={`hover:${!isScrolled ? "text-white" : "text-[var(--primary-maroon)]"} transition`}
+            className="font-semibold text-sm opacity-100 hover:text-muted-foreground transition-all duration-200 delay-100"
           >
             Pricing
           </Link>
           <Link
             to="/contact"
-            className={`hover:${!isScrolled ? "text-white" : "text-[var(--primary-maroon)]"} transition`}
+            className="font-semibold text-sm opacity-100 hover:text-muted-foreground transition-all duration-200 delay-100"
           >
             Contact
           </Link>
@@ -128,6 +105,6 @@ export default function Navbar() {
           </div>
         </motion.div>
       )}
-    </motion.nav>
+    </nav>
   );
 }
