@@ -9,9 +9,11 @@ import React from "react";
 
 import { AuthRoutes } from "./lib/utils";
 import { useSession } from "./hooks/use-session";
-import { EventDetailsPage, EventsPage, EventsPageLayout } from "./pages/events";
 import { RootLayout } from "./components/layout";
 import { EditorPage } from "./features/editor/page";
+import { EventsPage } from "./features/events/page";
+import { ErrorPage } from "./pages/ErrorPage";
+import { EditTemplatePage } from "./features/events/page/EditTemplate";
 
 function App() {
   const { pathname } = useLocation();
@@ -28,7 +30,11 @@ function App() {
   return (
     <Routes>
       <Route element={<RootLayout />}>
-        <Route index element={<HomePage />} />
+        {isAuthenticated ? (
+          <Route index element={<EventsPage />} />
+        ) : (
+          <Route index element={<HomePage />} />
+        )}
         <Route path="/about" element={<AboutPage />} />
 
         <Route path="/auth/" element={<AuthPage />}>
@@ -36,14 +42,17 @@ function App() {
           <Route path="verify" element={<UserVerify />} />
         </Route>
 
-        {/* Add more routes here */}
-        <Route path=":events" element={<EventsPageLayout />}>
+        {/* FIXME: Remove me later */}
+        {/* <Route path=":events" element={<EventsPageLayout />}>
           <Route index element={<EventsPage />} />
           <Route path=":event" element={<EventDetailsPage />} />
-        </Route>
+        </Route> */}
+        {/* Error route */}
+        <Route path="*" element={<ErrorPage />} />
       </Route>
       {/* Editor */}
       <Route path="/editor" element={<EditorPage />} />
+      <Route path="/editor/:editorId" element={<EditTemplatePage />} />
     </Routes>
   );
 }

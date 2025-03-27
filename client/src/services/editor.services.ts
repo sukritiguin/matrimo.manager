@@ -3,6 +3,8 @@ import {
   RenameEditorSchema,
   UpdateEditorSchema,
 } from "@/schemas/editor.schema";
+import { TUpload } from "@/types/canvas";
+import { TEditor, TTemplate, TTemplateWithUser } from "@/types/template";
 import axios, { AxiosError } from "axios";
 
 const editorApi = axios.create({
@@ -21,7 +23,7 @@ editorApi.interceptors.request.use(
 
 editorApi.interceptors.response.use(
   (response) => {
-    return response.data;
+    return response.data.data;
   },
   (error) => {
     if (error instanceof AxiosError) {
@@ -40,16 +42,16 @@ export const createNewEditor = (data: CreateEditorSchema) => {
   return editorApi.post(`/editors`, data);
 };
 
-export const getEditors = () => {
+export const getEditors = (): Promise<{ editors: TTemplate[] }> => {
   return editorApi.get(`/editors`);
 };
 
-export const getEditorById = (editorId: string) => {
+export const getEditorById = (editorId: string): Promise<{ editor: TEditor }> => {
   return editorApi.get(`/editors/${editorId}`);
 };
 
 export const updateEditor = (editorId: string, data: UpdateEditorSchema) => {
-  return editorApi.put(`/editors/${editorId}`, data);
+  return editorApi.patch(`/editors/${editorId}`, data);
 };
 
 export const deleteEditor = (editorId: string) => {
@@ -60,10 +62,22 @@ export const renameEditor = (editorId: string, data: RenameEditorSchema) => {
   return editorApi.post(`/editors/${editorId}/rename`, data);
 };
 
+export const saveEditor = (editorId: string, data: FormData) => {
+  return editorApi.post(`/editors/${editorId}/save`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const getUploadFiles = (): Promise<{ uploads: TUpload[] }> => {
+  return editorApi.get("/editors/uploads");
+};
+
 export const uploadFile = (image: File) => {
   const formData = new FormData();
   formData.append("image", image);
-  return editorApi.post(`/editors/upload`, formData, {
+  return editorApi.post(`/editors/uploads`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

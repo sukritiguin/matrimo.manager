@@ -11,7 +11,10 @@ interface State {
 
 const CanvasContext = createContext<State | undefined>(undefined);
 
-const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const CanvasProvider: React.FC<{
+  children: React.ReactNode;
+  initialCanvas: fabric.Canvas | null;
+}> = ({ children, initialCanvas }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = React.useRef<HTMLDivElement>(null);
   const [canvas, setCanvas] = React.useState<fabric.Canvas | null>(null);
@@ -42,23 +45,27 @@ const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
   } = useAppSelector((state) => state.canvas);
 
   React.useEffect(() => {
-    if (canvas) return;
+    if (!canvasRef.current || !canvasContainerRef.current || canvas) return;
 
-    if (canvasRef.current && canvasContainerRef.current) {
-      canvasContainerRef.current.style.width = `${width * 96}px`;
-      canvasContainerRef.current.style.height = `${height * 96}px`;
+    canvasContainerRef.current.style.width = `${width * 96}px`;
+    canvasContainerRef.current.style.height = `${height * 96}px`;
 
-      const newCanvas = new fabric.Canvas(canvasRef.current, {
-        width: canvasContainerRef.current.offsetWidth,
-        height: canvasContainerRef.current.offsetHeight,
-        backgroundColor: DEFAULT_BACKGROUND_COLOR,
-      });
+    const newCanvas = new fabric.Canvas(canvasRef.current, {
+      width: canvasContainerRef.current.offsetWidth,
+      height: canvasContainerRef.current.offsetHeight,
+      backgroundColor: DEFAULT_BACKGROUND_COLOR,
+    });
 
-      newCanvas.renderAll();
-      newCanvas.setZoom(zoomLevel / 100);
-      setCanvas(newCanvas);
+    if (initialCanvas) {
+      console.log("Initial canvas", initialCanvas);
+      newCanvas.loadFromJSON(initialCanvas.toJSON());
     }
+
+    newCanvas.renderAll();
+    newCanvas.setZoom(zoomLevel / 100);
+    setCanvas(newCanvas);
   }, []);
+  console.log("Canvas", canvas);
 
   // handle window events
   React.useEffect(() => {

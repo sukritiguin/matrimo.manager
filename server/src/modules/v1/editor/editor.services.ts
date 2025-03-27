@@ -45,11 +45,31 @@ export const getEditorsOfUser = apiHandler(
         authorId: req.user?.id!,
         isArchive: false,
       },
+      include: {
+        image: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    });
+
+    const sanitizeData = editors.map((editor) => {
+      return {
+        ...editor,
+        image: editor.image?.url,
+      };
     });
 
     return reply
       .status(200)
-      .send(new ApiResponse(200, { editors }, "Editors fetched successfully"));
+      .send(
+        new ApiResponse(
+          200,
+          { editors: sanitizeData },
+          "Editors fetched successfully"
+        )
+      );
   }
 );
 
@@ -165,6 +185,55 @@ export const shareEditor = apiHandler(
 
     //  create a shallow copy of the editor
     return reply.notImplemented();
+  }
+);
+
+export const saveEditor = apiHandler(
+  async (req: FastifyRequest, reply: FastifyReply) => {
+    const { editorId } = zodValidation(editorIdParamsSchema, req.params);
+    // const body = zodValidation(updateEditorSchema, req.body);
+    const editor = await fastify.prisma.editor.findUnique({
+      where: { id: editorId },
+    });
+
+    if (!editor) {
+      throw new ApiError(404, "Editor not found");
+    }
+
+    if (editor.authorId !== req.user?.id) {
+      throw new ApiError(
+        403,
+        "Unauthorized: You are not the author of this editor"
+      );
+    }
+    const fileData = await req.file();
+    if (!fileData) {
+      return reply.status(400).send({ message: "No file uploaded" });
+    }
+
+    const uploadedResult = await uploadFileInS3(fileData);
+    const image = await fastify.prisma.image.create({
+      data: {
+        ...uploadedResult,
+      },
+    });
+
+    const updatedEditor = await fastify.prisma.editor.update({
+      where: { id: editorId },
+      data: {
+        imageId: image?.id,
+      },
+    });
+
+    return reply
+      .status(200)
+      .send(
+        new ApiResponse(
+          200,
+          { editor: updatedEditor },
+          "Editor saved successfully"
+        )
+      );
   }
 );
 

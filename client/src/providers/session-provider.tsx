@@ -17,11 +17,8 @@ export const SessionContext = React.createContext<Session>({
   isAuthenticated: false,
 });
 
-export const SessionProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isInitialLoading, setInitialLoading] = React.useState(true);
   const notVerifiedDialog = useVerifyEmailDialog();
   const queryClient = useQueryClient();
   const { data, isSuccess } = useQuery({
@@ -40,6 +37,9 @@ export const SessionProvider = ({
         notVerifiedDialog.handleOpenChange(true);
       }
     },
+    onSettled: () => {
+      setInitialLoading(false);
+    },
   });
 
   React.useEffect(() => {
@@ -53,6 +53,11 @@ export const SessionProvider = ({
     );
     return () => clearInterval(interval);
   }, [refreshToken, isSuccess]);
+
+  //   TODO: Create intial loading
+  if (isInitialLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <SessionContext.Provider

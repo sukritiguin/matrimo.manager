@@ -3,9 +3,11 @@ import Navbar from "../common/navbar";
 
 export const RootLayout = () => {
   return (
-    <div className="flex min-h-screen pt-16 justify-center bg-gradient-to-r from-[var(--primary-maroon)] to-[var(--primary-gold)]">
-      <div className="w-full">
+    <div className="w-full">
+      <div className="h-16 bg-transparent border-b fixed top-0 z-50 backdrop-blur-3xl flex w-full justify-center items-center">
         <Navbar />
+      </div>
+      <div className="w-full min-h-[100%-64px] pt-16">
         <Outlet />
       </div>
     </div>

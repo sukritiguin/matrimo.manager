@@ -13,6 +13,7 @@ export const editorRoutes = (route: FastifyInstance) => {
   route.post("/:editorId/rename", editorService.renameEditor);
   route.post("/:editorId/download", editorService.downloadEditor);
   route.post("/:editorId/share", editorService.shareEditor);
+  route.post("/:editorId/save", editorService.saveEditor);
 
   route.get("/archives", editorService.getAllArchives);
   route.get("/archives/:editorId", editorService.getArchiveByEditorId);
