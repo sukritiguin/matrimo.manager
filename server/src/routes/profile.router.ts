@@ -8,7 +8,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
     { preHandler: [authMiddleware] },
     async (request, reply) => {
       if (!fastify.prisma) {
-        return reply.internalServerError("Prisma plugins not generated..");
+        // return reply.internalServerError("Prisma plugins not generated..");
       }
 
       const { firstName, lastName, profilePicURL } = request.body as {
@@ -24,7 +24,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
       });
 
       if (userProfile) {
-        return reply.code(501).badRequest();
+        // return reply.code(501).badRequest();
       }
 
       try {
@@ -39,7 +39,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
         reply.code(200).send(profile);
       } catch (error) {
         console.log(error);
-        reply.internalServerError("Failed to create user");
+        // reply.internalServerError("Failed to create user");
       }
     }
   );

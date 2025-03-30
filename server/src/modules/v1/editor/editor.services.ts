@@ -184,7 +184,7 @@ export const shareEditor = apiHandler(
     const { editorId } = zodValidation(editorIdParamsSchema, req.params);
 
     //  create a shallow copy of the editor
-    return reply.notImplemented();
+    return reply;
   }
 );
 

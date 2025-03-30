@@ -39,7 +39,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       if (!fastify.prisma) {
-        return reply.internalServerError("Prisma plugin not registered!");
+        // return reply.internalServerError("Prisma plugin not registered!");
       }
 
       try {
@@ -47,7 +47,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
         return users;
       } catch (error) {
         console.error("Database Error:", error);
-        return reply.internalServerError("Failed to fetch users");
+        // return reply.in("Failed to fetch users");
       }
     }
   );
@@ -94,7 +94,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       if (!fastify.prisma) {
-        return reply.internalServerError("Prisma plugin not registered!");
+        // return reply.internalServerError("Prisma plugin not registered!");
       }
 
       const { email, password } = request.body as {
