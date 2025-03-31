@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev:server": "cd server && npm run dev",
+    "dev:server": "turbo dev --filter=server",
     "dev:client": "turbo dev --filter=client",
     "dev": "turbo dev",
     "format": "prettier --write \"**/*.{ts,tsx,css,html}\"",
