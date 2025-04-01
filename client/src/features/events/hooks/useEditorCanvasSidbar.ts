@@ -4,12 +4,14 @@ import { debounce } from "lodash";
 import { ShapeElements, TextTemplates } from "../constants";
 import { getUploadFiles, uploadFile } from "@/services/editor.services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Photo, PhotosWithTotalResults } from "pexels";
 
 export const useEditorCanvasSidbar = () => {
   const [activeTab, setActiveTab] = React.useState("text");
   const [dragging, setDragging] = React.useState<string | null>(null);
   const [textTemplates, setTextTemplates] = React.useState(TextTemplates);
   const [shapeElements, setShapeElements] = React.useState(ShapeElements);
+  const [stockPhotos, setStockPhotos] = React.useState<any[]>([]);
 
   const handleSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
@@ -40,6 +42,10 @@ export const useEditorCanvasSidbar = () => {
       // Handle file upload logic here
       console.log("Uploads: ", data);
     }
+
+    if (activeTab == "photos") {
+      console.log("Photo search :: ", query);
+    }
   }, 200);
 
   // Tabs - text, uploads, elements, photos
@@ -54,6 +60,20 @@ export const useEditorCanvasSidbar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploads"] });
     },
+  });
+
+  const { data: pexelsApiData } = useQuery({
+    queryKey: ["photos", "stock"],
+    queryFn: async () => {
+      const res = await fetch("https://api.pexels.com/v1/curated?per_page=10", {
+        headers: {
+          Authorization: "VCg4PH06KfZ73ydUlq6Jq76P0I5t895AKsROTFkyAN1LyQ1dZsw9CUwx",
+        },
+      });
+
+      return (await res.json()) as PhotosWithTotalResults;
+    },
+    enabled: activeTab == "photos",
   });
 
   const { data } = useQuery({
@@ -104,5 +124,6 @@ export const useEditorCanvasSidbar = () => {
     handleDragEnd,
     textTemplates,
     shapeElements,
+    stockPhotos: pexelsApiData?.photos,
   };
 };

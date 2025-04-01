@@ -22,14 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { useInsertObject } from "../hooks/useInsertObject";
 import { useEditorCanvasSidbar } from "../hooks/useEditorCanvasSidbar";
 import { EditorTitle } from "./EditorTitle";
-
-const photos = [
-  { id: "1", name: "Nature", url: "/placeholder.svg?height=100&width=150" },
-  { id: "2", name: "City", url: "/placeholder.svg?height=100&width=150" },
-  { id: "3", name: "Abstract", url: "/placeholder.svg?height=100&width=150" },
-  { id: "4", name: "People", url: "/placeholder.svg?height=100&width=150" },
-  { id: "5", name: "Animals", url: "/placeholder.svg?height=100&width=150" },
-];
+import { Image as CustomImage } from "@/components/image";
 
 export const EditorSidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -48,7 +41,10 @@ export const EditorSidebar: React.FC = () => {
     uploads,
     textTemplates,
     shapeElements,
+    stockPhotos,
   } = useEditorCanvasSidbar();
+
+  console.log(stockPhotos);
 
   return (
     <Sidebar className="border-r">
@@ -230,27 +226,28 @@ export const EditorSidebar: React.FC = () => {
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                {photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, photo.id, "photo")}
-                    onDragEnd={handleDragEnd}
-                    className={cn(
-                      "group relative aspect-video cursor-grab overflow-hidden rounded-md border",
-                      dragging === photo.id && "border-primary opacity-50"
-                    )}
-                  >
-                    <img
-                      src={photo.url || "/placeholder.svg"}
-                      alt={photo.name}
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute bottom-0 w-full bg-black/50 p-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                      {photo.name}
+                {stockPhotos &&
+                  stockPhotos.map((photo, index) => (
+                    <div
+                      key={index}
+                      draggable
+                      //   onDragStart={(e) => handleDragStart(e, photo.id, "photo")}
+                      onDragEnd={handleDragEnd}
+                      className={cn(
+                        "group relative aspect-video cursor-grab overflow-hidden rounded-md border"
+                        // dragging === photo.id && "border-primary opacity-50"
+                      )}
+                    >
+                      <CustomImage
+                        src={photo.src.small || "/placeholder.svg"}
+                        alt={photo.alt || ""}
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute bottom-0 w-full bg-black/50 p-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        {photo.photographer}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </TabsContent>
           </ScrollArea>

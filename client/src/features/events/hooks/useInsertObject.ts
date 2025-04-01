@@ -175,7 +175,7 @@ export const useInsertObject = () => {
         onAddElement(data as ShapeElement);
         break;
       case "uploads":
-        console.log(type, data);
+        onAddUploadImage(data as TUpload);
         break;
       default:
         console.error(`Unsupported element: ${type}`);
