@@ -227,15 +227,15 @@ export const EditorSidebar: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {stockPhotos &&
-                  stockPhotos.map((photo, index) => (
+                  stockPhotos.map((photo: any, index: any) => (
                     <div
                       key={index}
                       draggable
-                      //   onDragStart={(e) => handleDragStart(e, photo.id, "photo")}
+                      onDragStart={(e) => handleDragStart(e, "photos", photo)}
                       onDragEnd={handleDragEnd}
                       className={cn(
-                        "group relative aspect-video cursor-grab overflow-hidden rounded-md border"
-                        // dragging === photo.id && "border-primary opacity-50"
+                        "group relative aspect-video cursor-grab overflow-hidden rounded-md border",
+                        dragging === photo.id && "border-primary opacity-50"
                       )}
                     >
                       <CustomImage

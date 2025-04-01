@@ -12,9 +12,11 @@ export const useEditorCanvasSidbar = () => {
   const [textTemplates, setTextTemplates] = React.useState(TextTemplates);
   const [shapeElements, setShapeElements] = React.useState(ShapeElements);
   const [stockPhotos, setStockPhotos] = React.useState<any[]>([]);
+  const [photoQuery, setPhotoQuery] = React.useState("nature"); // Default query
 
   const handleSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
+    setPhotoQuery(query); // Update the query state
 
     if (activeTab === "text") {
       setTextTemplates((prev) =>
@@ -45,6 +47,13 @@ export const useEditorCanvasSidbar = () => {
 
     if (activeTab == "photos") {
       console.log("Photo search :: ", query);
+      setStockPhotos((prev) =>
+        query
+          ? prev.filter(
+              (item) => item.name.toLowerCase().includes(query) || item.type.includes(query)
+            )
+          : []
+      );
     }
   }, 200);
 
@@ -63,17 +72,17 @@ export const useEditorCanvasSidbar = () => {
   });
 
   const { data: pexelsApiData } = useQuery({
-    queryKey: ["photos", "stock"],
+    queryKey: ["photos", "stock", photoQuery],
     queryFn: async () => {
-      const res = await fetch("https://api.pexels.com/v1/curated?per_page=10", {
+      const res = await fetch(`https://api.pexels.com/v1/search?query=${photoQuery}?per_page=10`, {
         headers: {
-          Authorization: "VCg4PH06KfZ73ydUlq6Jq76P0I5t895AKsROTFkyAN1LyQ1dZsw9CUwx",
+          Authorization: import.meta.env.VITE_PIXEL_API_KEY,
         },
       });
 
       return (await res.json()) as PhotosWithTotalResults;
     },
-    enabled: activeTab == "photos",
+    enabled: activeTab === "photos" && photoQuery.length > 0,
   });
 
   const { data } = useQuery({
