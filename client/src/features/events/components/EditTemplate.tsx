@@ -7,10 +7,19 @@ import { EditorToolbarHeader } from "./EditorToolbarHeader";
 import { EditorCanvas } from "./EditorCanvas";
 
 export const EditTemplate: React.FC = () => {
-  const { editorId } = useEditTemplate();
+  const { editorId, error, isPending } = useEditTemplate();
 
-  if (!editorId) {
+  if (!editorId || isPending) {
     return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return (
+      <div>
+        <p>Somthing went wrong </p>
+        <p>{error.message}</p>
+      </div>
+    );
   }
 
   return (

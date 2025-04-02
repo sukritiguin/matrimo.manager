@@ -4,6 +4,8 @@ import { ChangeEvent, useCallback } from "react";
 import { useEditorCanvas } from "./useEditorCanvas";
 import { DEFAULT_BORDER_COLOR, ShapeElement, TextTemplate } from "../constants";
 import { TUpload } from "@/types/canvas";
+import { Photo } from "pexels";
+import { data } from "react-router-dom";
 
 export const useInsertObject = () => {
   const { canvas, canvasContainerRef } = useEditorCanvas();
@@ -136,6 +138,27 @@ export const useInsertObject = () => {
     [canvas]
   );
 
+  const onAddStockPhoto = useCallback(
+    async (data: Photo, left = 50, top = 50) => {
+      if (!canvas) {
+        console.log("Canvas not found!");
+        return;
+      }
+
+      const image = await fabric.FabricImage.fromURL(data.src.small, {
+        crossOrigin: "anonymous",
+      });
+      image.set("left", left);
+      image.set("top", top);
+      canvas.add(image);
+      canvas.setActiveObject(image);
+      canvas.requestRenderAll();
+
+      console.log("Image dragged successfully", image);
+    },
+    [canvas]
+  );
+
   const handleDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
@@ -157,6 +180,9 @@ export const useInsertObject = () => {
           case "uploads":
             onAddUploadImage(data as TUpload, clientX, clientY);
             break;
+          case "photos":
+            onAddStockPhoto(data as Photo, clientX, clientY);
+            break;
           default:
             console.error(`Unsupported element: ${type}`);
             break;
@@ -175,7 +201,10 @@ export const useInsertObject = () => {
         onAddElement(data as ShapeElement);
         break;
       case "uploads":
-        console.log(type, data);
+        onAddUploadImage(data as TUpload);
+        break;
+      case "photos":
+        onAddStockPhoto(data as Photo);
         break;
       default:
         console.error(`Unsupported element: ${type}`);

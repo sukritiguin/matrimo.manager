@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 import Fastify from "fastify";
-import fastifySensible from "fastify-sensible";
+// import fastifySensible from "fastify-sensible";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import fastifyJWT from "@fastify/jwt";
@@ -36,7 +36,7 @@ fastify.register(cors, {
 fastify.register(multipart);
 // Register plugins
 fastify.register(prismaPlugin);
-fastify.register(fastifySensible);
+// fastify.register(fastifySensible);
 fastify.register(swagger, {
   swagger: {
     info: {

@@ -28,13 +28,13 @@ editorApi.interceptors.response.use(
   (error) => {
     if (error instanceof AxiosError) {
       console.log("Editor response error :: ", error.response?.data.message);
-      return Promise.reject(error.response?.data.message);
+      return Promise.reject(error.response?.data);
     }
     if (error instanceof Error) {
       console.log("Editor request error :: ", error.message);
-      return Promise.reject(error.message);
+      return Promise.reject(error);
     }
-    return Promise.reject("An unknown error occurred");
+    return Promise.reject(new Error("An unknown error occurred"));
   }
 );
 

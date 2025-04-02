@@ -4,15 +4,19 @@ import { debounce } from "lodash";
 import { ShapeElements, TextTemplates } from "../constants";
 import { getUploadFiles, uploadFile } from "@/services/editor.services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Photo, PhotosWithTotalResults } from "pexels";
 
 export const useEditorCanvasSidbar = () => {
   const [activeTab, setActiveTab] = React.useState("text");
   const [dragging, setDragging] = React.useState<string | null>(null);
   const [textTemplates, setTextTemplates] = React.useState(TextTemplates);
   const [shapeElements, setShapeElements] = React.useState(ShapeElements);
+  const [stockPhotos, setStockPhotos] = React.useState<any[]>([]);
+  const [photoQuery, setPhotoQuery] = React.useState("nature"); // Default query
 
   const handleSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
+    setPhotoQuery(query); // Update the query state
 
     if (activeTab === "text") {
       setTextTemplates((prev) =>
@@ -40,6 +44,17 @@ export const useEditorCanvasSidbar = () => {
       // Handle file upload logic here
       console.log("Uploads: ", data);
     }
+
+    if (activeTab == "photos") {
+      console.log("Photo search :: ", query);
+      setStockPhotos((prev) =>
+        query
+          ? prev.filter(
+              (item) => item.name.toLowerCase().includes(query) || item.type.includes(query)
+            )
+          : []
+      );
+    }
   }, 200);
 
   // Tabs - text, uploads, elements, photos
@@ -54,6 +69,20 @@ export const useEditorCanvasSidbar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploads"] });
     },
+  });
+
+  const { data: pexelsApiData } = useQuery({
+    queryKey: ["photos", "stock", photoQuery],
+    queryFn: async () => {
+      const res = await fetch(`https://api.pexels.com/v1/search?query=${photoQuery}?per_page=10`, {
+        headers: {
+          Authorization: import.meta.env.VITE_PIXEL_API_KEY,
+        },
+      });
+
+      return (await res.json()) as PhotosWithTotalResults;
+    },
+    enabled: activeTab === "photos" && photoQuery.length > 0,
   });
 
   const { data } = useQuery({
@@ -104,5 +133,6 @@ export const useEditorCanvasSidbar = () => {
     handleDragEnd,
     textTemplates,
     shapeElements,
+    stockPhotos: pexelsApiData?.photos,
   };
 };

@@ -2,14 +2,10 @@
   "name": "matrimo.manager",
   "version": "1.0.0",
   "description": "",
-  "workspaces": [
-    "client",
-    "server"
-  ],
   "scripts": {
-    "dev:server": "cd server && npm run dev",
-    "dev:client": "cd client && npm run dev",
-    "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"cd client && npm run dev\" \"cd server && npm run dev\"",
+    "dev:server": "turbo dev --filter=server",
+    "dev:client": "turbo dev --filter=client",
+    "dev": "turbo dev",
     "format": "prettier --write \"**/*.{ts,tsx,css,html}\"",
     "db:dev:up": "docker compose up matrimo-db -d",
     "db:dev:stop": "docker compose stop matrimo-db"
@@ -36,6 +32,8 @@
   },
   "devDependencies": {
     "husky": "^8.0.3",
-    "lint-staged": "^15.4.3"
-  }
+    "lint-staged": "^15.4.3",
+    "turbo": "^2.4.4"
+  },
+  "packageManager": "pnpm@9.0.0"
 }
