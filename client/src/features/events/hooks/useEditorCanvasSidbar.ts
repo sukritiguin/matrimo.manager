@@ -13,10 +13,14 @@ export const useEditorCanvasSidbar = () => {
   const [shapeElements, setShapeElements] = React.useState(ShapeElements);
   const [stockPhotos, setStockPhotos] = React.useState<any[]>([]);
   const [photoQuery, setPhotoQuery] = React.useState("nature"); // Default query
+  const [page, setPage] = React.useState(1); // Pagination State
+  const perPage = 10; // Number of images per page
 
   const handleSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setPhotoQuery(query); // Update the query state
+    setPage(1); // Reset page when a new search happens
+    setStockPhotos([]); // Clear previous results
 
     if (activeTab === "text") {
       setTextTemplates((prev) =>
@@ -60,6 +64,8 @@ export const useEditorCanvasSidbar = () => {
   // Tabs - text, uploads, elements, photos
   const onChangeTab = (tab: string) => {
     setActiveTab(tab);
+    setPage(1); // Reset page on tab change
+    setStockPhotos([]); // Clear previous results
   };
 
   const queryClient = useQueryClient();
@@ -71,19 +77,27 @@ export const useEditorCanvasSidbar = () => {
     },
   });
 
-  const { data: pexelsApiData } = useQuery({
-    queryKey: ["photos", "stock", photoQuery],
+  const { data: pexelsApiData, isFetching } = useQuery<PhotosWithTotalResults, Error>({
+    queryKey: ["photos", "stock", photoQuery, page],
     queryFn: async () => {
-      const res = await fetch(`https://api.pexels.com/v1/search?query=${photoQuery}?per_page=10`, {
-        headers: {
-          Authorization: import.meta.env.VITE_PIXEL_API_KEY,
-        },
-      });
-
+      const res = await fetch(
+        `https://api.pexels.com/v1/search?query=${photoQuery}&per_page=${perPage}&page=${page}`,
+        {
+          headers: {
+            Authorization: import.meta.env.VITE_PIXEL_API_KEY,
+          },
+        }
+      );
       return (await res.json()) as PhotosWithTotalResults;
     },
-    enabled: activeTab === "photos" && photoQuery.length > 0,
+    enabled: activeTab === "photos",
   });
+
+  React.useEffect(() => {
+    if (pexelsApiData) {
+      setStockPhotos((prev) => [...prev, ...pexelsApiData.photos]); // Append new data
+    }
+  }, [pexelsApiData]);
 
   const { data } = useQuery({
     queryKey: ["uploads"],
@@ -107,6 +121,12 @@ export const useEditorCanvasSidbar = () => {
       "image/*": [".jpeg", ".jpg", ".png", ".gif", ".svg"],
     },
   });
+
+  const loadMorePhotos = () => {
+    if (!isFetching) {
+      setPage((prev) => prev + 1);
+    }
+  };
 
   // Handle drag start for elements
   const handleDragStart = (event: React.DragEvent, type: string, data: any) => {
@@ -133,6 +153,9 @@ export const useEditorCanvasSidbar = () => {
     handleDragEnd,
     textTemplates,
     shapeElements,
-    stockPhotos: pexelsApiData?.photos,
+    // stockPhotos: pexelsApiData?.photos,
+    stockPhotos,
+    loadMorePhotos, // Function to load more images
+    isFetching,
   };
 };
