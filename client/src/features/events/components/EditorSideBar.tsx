@@ -42,6 +42,8 @@ export const EditorSidebar: React.FC = () => {
     textTemplates,
     shapeElements,
     stockPhotos,
+    loadMorePhotos,
+    isFetching,
   } = useEditorCanvasSidbar();
 
   console.log(stockPhotos);
@@ -249,6 +251,24 @@ export const EditorSidebar: React.FC = () => {
                     </div>
                   ))}
               </div>
+              <button
+                onClick={loadMorePhotos}
+                disabled={isFetching}
+                className={`px-6 py-2 rounded-lg text-white font-semibold transition-all duration-300 ${
+                  isFetching
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 active:scale-95"
+                }`}
+              >
+                {isFetching ? (
+                  <div className="flex items-center gap-2">
+                    <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+                    Loading...
+                  </div>
+                ) : (
+                  "Load More"
+                )}
+              </button>
             </TabsContent>
           </ScrollArea>
         </Tabs>
