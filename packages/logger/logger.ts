@@ -20,6 +20,9 @@ const emojis = {
   verbose: "🔍",
 };
 
+type LogLevel = keyof typeof emojis;
+type LogOptions = { context?: string };
+
 export class Logger {
   private logger: pino.Logger;
   private enabled = process.env.NODE_ENV !== "production";
@@ -37,67 +40,107 @@ export class Logger {
     });
   }
 
-  private format(
-    level: keyof typeof emojis,
-    context: string,
-    message: string
-  ): string {
+  private stringifyArg(arg: unknown): string {
+    if (typeof arg === "string") return arg;
+    if (arg instanceof Error)
+      return `${arg.name}: ${arg.message}\n${arg.stack}`;
+    return JSON.stringify(arg, null, 2);
+  }
+
+  private format(level: LogLevel, context: string, ...args: unknown[]): string {
     const emoji = emojis[level] || "";
     const ctx = `${colors.cyan}[${context}]${colors.reset}`;
-    const msgColor =
-      level === "error"
-        ? colors.red
-        : level === "warn"
-          ? colors.yellow
-          : level === "debug"
-            ? colors.magenta
-            : level === "verbose"
-              ? colors.gray
-              : colors.reset;
 
-    return `${emoji} ${ctx} ${msgColor}${message}${colors.reset}`;
+    let msgColor = colors.reset;
+    switch (level) {
+      case "error":
+        msgColor = colors.red;
+        break;
+      case "warn":
+        msgColor = colors.yellow;
+        break;
+      case "debug":
+        msgColor = colors.magenta;
+        break;
+      case "verbose":
+        msgColor = colors.gray;
+        break;
+      default:
+        msgColor = colors.reset;
+        break;
+    }
+
+    const message = args
+      .map((arg) => `${msgColor}${this.stringifyArg(arg)}${colors.reset}`)
+      .join(" ");
+
+    return `${emoji} ${ctx} ${message}`;
   }
 
-  log(message: string, context?: string) {
-    if (this.enabled) {
-      this.logger.info(this.format("log", context || this.context, message));
+  private write(level: LogLevel, args: unknown[], opts?: LogOptions) {
+    if (!this.enabled) return;
+
+    const ctx = opts?.context || this.context;
+    const msg = this.format(level, ctx, ...args);
+
+    switch (level) {
+      case "log":
+      case "info":
+        this.logger.info(msg);
+        break;
+      case "warn":
+        this.logger.warn(msg);
+        break;
+      case "error":
+        this.logger.error(msg);
+        break;
+      case "debug":
+        this.logger.debug(msg);
+        break;
+      case "verbose":
+        this.logger.trace(msg);
+        break;
     }
   }
 
-  info(message: string, context?: string) {
-    if (this.enabled) {
-      this.logger.info(this.format("info", context || this.context, message));
-    }
+  private parseArgs(args: unknown[]): [unknown[], LogOptions?] {
+    const [last] = args.slice(-1);
+    const isOpts =
+      typeof last === "object" &&
+      last !== null &&
+      !Array.isArray(last) &&
+      "context" in last;
+    return isOpts ? [args.slice(0, -1), last as LogOptions] : [args, undefined];
   }
 
-  warn(message: string, context?: string) {
-    if (this.enabled) {
-      this.logger.warn(this.format("warn", context || this.context, message));
-    }
+  log(...args: unknown[]) {
+    const [rest, opts] = this.parseArgs(args);
+    this.write("log", rest, opts);
   }
 
-  error(message: string, trace?: string, context?: string) {
-    if (this.enabled) {
-      const formatted = this.format("error", context || this.context, message);
-      const output = trace
-        ? `${formatted}\n${colors.gray}TRACE: ${trace}${colors.reset}`
-        : formatted;
-      this.logger.error(output);
-    }
+  info(...args: unknown[]) {
+    const [rest, opts] = this.parseArgs(args);
+    this.write("info", rest, opts);
   }
 
-  debug(message: string, context?: string) {
-    if (this.enabled) {
-      this.logger.debug(this.format("debug", context || this.context, message));
-    }
+  warn(...args: unknown[]) {
+    const [rest, opts] = this.parseArgs(args);
+    this.write("warn", rest, opts);
   }
 
-  verbose(message: string, context?: string) {
-    if (this.enabled) {
-      this.logger.trace(
-        this.format("verbose", context || this.context, message)
-      );
-    }
+  error(...args: unknown[]) {
+    const [rest, opts] = this.parseArgs(args);
+    this.write("error", rest, opts);
+  }
+
+  debug(...args: unknown[]) {
+    const [rest, opts] = this.parseArgs(args);
+    this.write("debug", rest, opts);
+  }
+
+  verbose(...args: unknown[]) {
+    const [rest, opts] = this.parseArgs(args);
+    this.write("verbose", rest, opts);
   }
 
   setContext(ctx: string) {
@@ -105,6 +148,6 @@ export class Logger {
   }
 
   addSubContext(ctx: string) {
-    this.context = this.context ? `${this.context}: ${ctx}` : ctx;
+    this.context = this.context ? `${this.context}:${ctx}` : ctx;
   }
 }
