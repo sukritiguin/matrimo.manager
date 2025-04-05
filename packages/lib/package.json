@@ -1,0 +1,31 @@
+{
+  "name": "@matrimo/lib",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b --watch"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@matrimo/logger": "workspace:*",
+    "@types/express": "^5.0.1"
+  },
+  "keywords": [],
+  "author": "Subhajit Pramanik",
+  "license": "ISC",
+  "private": true,
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./api": {
+      "require": "./dist/api/index.js",
+      "import": "./dist/api/index.js"
+    }
+  }
+}
