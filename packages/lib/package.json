@@ -8,11 +8,17 @@
     "dev": "tsc -b --watch"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "@aws-sdk/client-s3": "^3.772.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "multer": "1.4.5-lts.2",
+    "nodemailer": "^6.10.0"
   },
   "devDependencies": {
     "@matrimo/logger": "workspace:*",
-    "@types/express": "^5.0.1"
+    "@types/express": "^5.0.1",
+    "@types/multer": "^1.4.12",
+    "@types/nodemailer": "^6.4.17"
   },
   "keywords": [],
   "author": "Subhajit Pramanik",

@@ -5,3 +5,4 @@ export * from "./utils/apiResponse";
 export * from "./utils/errorConverter";
 export * from "./utils/errorHandler";
 export * from "./utils/notFound";
+export * from "./mail";
