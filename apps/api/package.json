@@ -5,7 +5,8 @@
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "dev": "node --experimental-loader=ts-node/esm --trace-warnings --env-file=.env --watch src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "watch": "node --loader=ts-node/esm --trace-warnings --env-file=.env --watch src/server.ts",
     "build": "tsc -b",
     "start": "node dist/server.js",
     "serve": "pnpm build && pnpm start"
@@ -15,16 +16,23 @@
   "license": "ISC",
   "dependencies": {
     "@matrimo/db": "workspace:*",
+    "@matrimo/lib": "workspace:*",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^5.1.0",
-    "helmet": "^8.1.0"
+    "helmet": "^8.1.0",
+    "tsx": "^4.19.3",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@matrimo/logger": "workspace:*",
+    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.14.0",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.2"
   }
 }

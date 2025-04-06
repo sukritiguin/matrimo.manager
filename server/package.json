@@ -10,8 +10,7 @@
     "prisma:gen": "prisma generator",
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:generate": "npx prisma generate",
-    "prisma:studio": "prisma studio",
-    "postinstall": "pnpm prisma:generate"
+    "prisma:studio": "prisma studio"
   },
   "keywords": [],
   "author": "",
