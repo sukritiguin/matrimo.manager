@@ -1,6 +1,7 @@
 import { ErrorRequestHandler, NextFunction, Response, Request } from "express";
 import { ApiError } from "./apiError.js";
 import { apiLogger } from "./apiLogger.js";
+import { ApiResponse } from "./apiResponse.js";
 
 interface CustomResponse extends Response {
   locals: {
@@ -37,8 +38,8 @@ export const errorHandler: ErrorRequestHandler = (
   };
 
   if (process.env.NODE_ENV === "development") {
-    apiLogger.error("[Error Handler]", JSON.stringify(err));
+    apiLogger.error("[Error Handler]", JSON.stringify(response));
   }
 
-  res.status(statusCode).json(response);
+  res.status(statusCode).json(ApiResponse.error<string>(message));
 };

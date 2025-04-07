@@ -6,3 +6,4 @@ export * from "./utils/errorConverter";
 export * from "./utils/errorHandler";
 export * from "./utils/notFound";
 export * from "./mail";
+export * from "./utils/zodValidation";
