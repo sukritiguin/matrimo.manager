@@ -154,7 +154,7 @@ export const refreshToken = apiHandler(async (req: Request, res: Response) => {
     },
   });
   if (!currentSession) throw new ApiError(401, "Refresh token not valid");
-  if (currentSession.revoked || currentSession.expires > new Date(Date.now())) {
+  if (currentSession.revoked || currentSession.expires < new Date(Date.now())) {
     throw new ApiError(400, "Refresh token has expried!");
   }
   await client.session.update({
