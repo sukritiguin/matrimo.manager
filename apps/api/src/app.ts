@@ -16,9 +16,11 @@ app.use(express.static("public"));
 // Routes
 import healthCheckRoute from "./routes/healthCheck.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import usersRoutes from "./routes/users.routes.js";
 
 app.use("/healthy", healthCheckRoute);
 app.use("/auth", authRoutes);
+app.use("/users", usersRoutes);
 
 // Error handle
 import { errorConverter, errorHandler, notFound } from "@matrimo/lib/api";
