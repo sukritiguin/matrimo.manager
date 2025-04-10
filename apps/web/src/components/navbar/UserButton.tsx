@@ -4,14 +4,22 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { User2 } from "lucide-react";
-import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { useSession } from "@/hooks/useSession";
 import { useNavigate } from "@tanstack/react-router";
+import { useTheme } from "@/hooks/useTheme";
 
 export const UserButton: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
   const navigate = useNavigate();
@@ -19,6 +27,8 @@ export const UserButton: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
     session: { isAuthenticated },
     signout: { mutate: signout },
   } = useSession();
+
+  const { themes, theme, setTheme } = useTheme();
 
   if (isMobile) {
     return (
@@ -55,10 +65,28 @@ export const UserButton: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent sideOffset={8}>
         <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
           Profile
         </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Theme</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent sideOffset={4}>
+              <DropdownMenuRadioGroup
+                value={theme}
+                onValueChange={(value) => setTheme(value as typeof theme)}
+              >
+                {themes.map((theme) => (
+                  <DropdownMenuRadioItem value={theme} className="capitalize">
+                    {theme}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signout()}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

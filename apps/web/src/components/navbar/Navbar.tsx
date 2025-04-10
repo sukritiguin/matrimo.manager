@@ -23,9 +23,9 @@ export function Navbar() {
 
   return (
     <header className="h-12 bg-transparent border-b fixed top-0 z-50 backdrop-blur-3xl flex w-full justify-center items-center">
-      <div className="w-full bg-secondary border-b flex items-center justify-center">
-        <nav className="w-full h-16 max-w-7xl z-50 transition-all">
-          <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="w-full flex items-center justify-center">
+        <nav className="w-full max-w-7xl z-50 transition-all">
+          <div className="container mx-auto px-6 flex justify-between items-center">
             <Link
               to="/"
               className={`text-2xl font-bold capitalize roboto-slab tracking-wider`}
