@@ -8,7 +8,8 @@
     "dev": "turbo dev",
     "format": "prettier --write \"**/*.{ts,tsx,css,html}\"",
     "db:dev:up": "docker compose up matrimo-db -d",
-    "db:dev:stop": "docker compose stop matrimo-db"
+    "db:dev:stop": "docker compose stop matrimo-db",
+    "prisma-studio": "turbo prisma-studio"
   },
   "lint-staged": {
     "**/*.{ts,tsx,css,html}": "prettier --write"
