@@ -78,7 +78,11 @@ export const UserButton: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
                 onValueChange={(value) => setTheme(value as typeof theme)}
               >
                 {themes.map((theme) => (
-                  <DropdownMenuRadioItem value={theme} className="capitalize">
+                  <DropdownMenuRadioItem
+                    key={theme}
+                    value={theme}
+                    className="capitalize"
+                  >
                     {theme}
                   </DropdownMenuRadioItem>
                 ))}
