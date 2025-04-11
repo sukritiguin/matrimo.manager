@@ -15,14 +15,17 @@ model User {
     emailVerified DateTime?
     password      UserPassword?
     bio           String?
-    imageUrl      String?
     verified      Boolean       @default(false)
     onBoarding    Boolean       @default(false)
+
+    imageId Int?          @default(1)
+    image   ProfileImage? @relation(fields: [imageId], references: [id])
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     account   Account[]
     sessions  Session[]
+    event     Event[]
 }
 
 model UserPassword {
@@ -79,4 +82,83 @@ model Account {
     @@unique([provider, providerAccountId])
     @@index([userId])
     @@index([type])
+}
+
+model ProfileImage {
+    id        Int      @id @default(autoincrement())
+    url       String
+    filename  String
+    fileKey   String
+    mimetype  String
+    size      Int
+    revoked   Boolean  @default(false)
+    createdAt DateTime @default(now())
+
+    user User[]
+}
+
+model Image {
+    id        String   @id @default(cuid())
+    url       String
+    filename  String
+    fileKey   String
+    mimetype  String
+    size      Int
+    revoked   Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    event Event[]
+}
+
+model Canvas {
+    id    String  @id @default(cuid())
+    title String?
+    data  Json
+
+    revoked   Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    event     Event[]
+}
+
+enum EventType {
+    WEDDING
+    BIRTHDAY
+    ANNIVERSARY
+    RICE_CEREMONY
+    CUSTOM
+}
+
+model EventCategory {
+    id          Int       @id @default(autoincrement())
+    name        String
+    eventType   EventType
+    customEvent String?
+    events      Event[]
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+}
+
+model Event {
+    id          String   @id @default(uuid())
+    title       String   @default("Untitled")
+    description String?
+    tags        String[]
+    canvasId    String
+    canvas      Canvas   @relation(fields: [canvasId], references: [id], onDelete: Cascade)
+    images      Image[]
+    ownerId     Int
+    owner       User     @relation(fields: [ownerId], references: [id])
+
+    isArchive Boolean @default(false)
+    revoked   Boolean @default(false)
+
+    createdAt  DateTime      @default(now())
+    updatedAt  DateTime      @updatedAt
+    categoryId Int
+    category   EventCategory @relation(fields: [categoryId], references: [id])
+
+    @@index([canvasId])
+    @@index([ownerId, canvasId])
 }
