@@ -23,15 +23,20 @@ model User {
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
-    account   Account[]
+    accounts  Account[]
     sessions  Session[]
-    event     Event[]
+    events    Event[]
+    canvases  Canvas[]
+
+    @@map("users")
 }
 
 model UserPassword {
     hash   String
     userId Int    @unique
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("user_passwords")
 }
 
 model Session {
@@ -48,6 +53,7 @@ model Session {
 
     @@index([userId])
     @@index([userId, sessionToken])
+    @@map("sessions")
 }
 
 model VerificationToken {
@@ -60,6 +66,7 @@ model VerificationToken {
     updatedAt  DateTime @updatedAt
 
     @@index([identifier])
+    @@map("verification_tokens")
 }
 
 model Account {
@@ -82,44 +89,56 @@ model Account {
     @@unique([provider, providerAccountId])
     @@index([userId])
     @@index([type])
+    @@map("accounts")
 }
 
 model ProfileImage {
-    id        Int      @id @default(autoincrement())
-    url       String
-    filename  String
-    fileKey   String
-    mimetype  String
+    id        Int       @id @default(autoincrement())
+    url       String    @db.VarChar(2048)
+    filename  String    @db.VarChar(255)
+    fileKey   String    @unique
+    mimetype  String    @db.VarChar(100)
     size      Int
-    revoked   Boolean  @default(false)
-    createdAt DateTime @default(now())
+    revokedAt DateTime?
+    createdAt DateTime  @default(now())
 
     user User[]
+
+    @@map("profile_images")
 }
 
 model Image {
-    id        String   @id @default(cuid())
-    url       String
-    filename  String
-    fileKey   String
-    mimetype  String
+    id        String    @id @default(cuid())
+    url       String    @db.VarChar(2048)
+    filename  String    @db.VarChar(255)
+    fileKey   String    @unique
+    mimetype  String    @db.VarChar(100)
     size      Int
-    revoked   Boolean  @default(false)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    revokedAt DateTime?
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
 
     event Event[]
+
+    @@index([fileKey])
+    @@index([revokedAt])
+    @@map("images")
 }
 
 model Canvas {
     id    String  @id @default(cuid())
-    title String?
+    title String? @db.VarChar(255)
     data  Json
 
-    revoked   Boolean  @default(false)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    revokedAt DateTime?
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
     event     Event[]
+    userId    Int
+    user      User      @relation(fields: [userId], references: [id])
+
+    @@index([userId])
+    @@map("canvases")
 }
 
 enum EventType {
@@ -128,6 +147,7 @@ enum EventType {
     ANNIVERSARY
     RICE_CEREMONY
     CUSTOM
+    OTHER
 }
 
 model EventCategory {
@@ -138,6 +158,8 @@ model EventCategory {
     events      Event[]
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
+
+    @@map("event_categories")
 }
 
 model Event {
@@ -145,20 +167,24 @@ model Event {
     title       String   @default("Untitled")
     description String?
     tags        String[]
-    canvasId    String
-    canvas      Canvas   @relation(fields: [canvasId], references: [id], onDelete: Cascade)
     images      Image[]
-    ownerId     Int
-    owner       User     @relation(fields: [ownerId], references: [id])
 
     isArchive Boolean @default(false)
-    revoked   Boolean @default(false)
 
-    createdAt  DateTime      @default(now())
-    updatedAt  DateTime      @updatedAt
+    revokedAt DateTime?
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    ownerId    Int
+    canvasId   String
     categoryId Int
-    category   EventCategory @relation(fields: [categoryId], references: [id])
+    owner      User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    canvas     Canvas        @relation(fields: [canvasId], references: [id], onDelete: Cascade)
+    category   EventCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
     @@index([canvasId])
     @@index([ownerId, canvasId])
+    @@index([isArchive])
+    @@index([revokedAt])
+    @@map("events")
 }
