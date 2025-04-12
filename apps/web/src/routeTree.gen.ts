@@ -17,25 +17,21 @@ import { Route as PricingImport } from './routes/pricing'
 import { Route as FeaturesImport } from './routes/features'
 import { Route as ContactImport } from './routes/contact'
 import { Route as AboutImport } from './routes/about'
+import { Route as ProtectedRouteImport } from './routes/_protected/route'
 import { Route as IndexImport } from './routes/index'
-import { Route as privatePImport } from './routes/(private)/_p'
+import { Route as ProtectedProfileImport } from './routes/_protected/profile'
+import { Route as ProtectedLibraryImport } from './routes/_protected/library'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
-import { Route as privatePProfileImport } from './routes/(private)/_p.profile'
+import { Route as ProtectedEditorEditorIdImport } from './routes/_protected/editor/$editorId'
 import { Route as authAuthGoogleCallbackImport } from './routes/(auth)/_auth.google.callback'
 import { Route as authAuthAuthSignupImport } from './routes/(auth)/_auth.auth.signup'
 import { Route as authAuthAuthSigninImport } from './routes/(auth)/_auth.auth.signin'
 
 // Create Virtual Routes
 
-const privateImport = createFileRoute('/(private)')()
 const authImport = createFileRoute('/(auth)')()
 
 // Create/Update Routes
-
-const privateRoute = privateImport.update({
-  id: '/(private)',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const authRoute = authImport.update({
   id: '/(auth)',
@@ -66,15 +62,27 @@ const AboutRoute = AboutImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ProtectedRouteRoute = ProtectedRouteImport.update({
+  id: '/_protected',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const privatePRoute = privatePImport.update({
-  id: '/_p',
-  getParentRoute: () => privateRoute,
+const ProtectedProfileRoute = ProtectedProfileImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+
+const ProtectedLibraryRoute = ProtectedLibraryImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => ProtectedRouteRoute,
 } as any)
 
 const authAuthRoute = authAuthImport.update({
@@ -82,10 +90,10 @@ const authAuthRoute = authAuthImport.update({
   getParentRoute: () => authRoute,
 } as any)
 
-const privatePProfileRoute = privatePProfileImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => privatePRoute,
+const ProtectedEditorEditorIdRoute = ProtectedEditorEditorIdImport.update({
+  id: '/editor/$editorId',
+  path: '/editor/$editorId',
+  getParentRoute: () => ProtectedRouteRoute,
 } as any)
 
 const authAuthGoogleCallbackRoute = authAuthGoogleCallbackImport.update({
@@ -115,6 +123,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRoute
     }
     '/about': {
@@ -159,26 +174,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuthImport
       parentRoute: typeof authRoute
     }
-    '/(private)': {
-      id: '/(private)'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof privateImport
-      parentRoute: typeof rootRoute
+    '/_protected/library': {
+      id: '/_protected/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof ProtectedLibraryImport
+      parentRoute: typeof ProtectedRouteImport
     }
-    '/(private)/_p': {
-      id: '/(private)/_p'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof privatePImport
-      parentRoute: typeof privateRoute
-    }
-    '/(private)/_p/profile': {
-      id: '/(private)/_p/profile'
+    '/_protected/profile': {
+      id: '/_protected/profile'
       path: '/profile'
       fullPath: '/profile'
-      preLoaderRoute: typeof privatePProfileImport
-      parentRoute: typeof privatePImport
+      preLoaderRoute: typeof ProtectedProfileImport
+      parentRoute: typeof ProtectedRouteImport
+    }
+    '/_protected/editor/$editorId': {
+      id: '/_protected/editor/$editorId'
+      path: '/editor/$editorId'
+      fullPath: '/editor/$editorId'
+      preLoaderRoute: typeof ProtectedEditorEditorIdImport
+      parentRoute: typeof ProtectedRouteImport
     }
     '/(auth)/_auth/auth/signin': {
       id: '/(auth)/_auth/auth/signin'
@@ -206,6 +221,22 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
+interface ProtectedRouteRouteChildren {
+  ProtectedLibraryRoute: typeof ProtectedLibraryRoute
+  ProtectedProfileRoute: typeof ProtectedProfileRoute
+  ProtectedEditorEditorIdRoute: typeof ProtectedEditorEditorIdRoute
+}
+
+const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
+  ProtectedLibraryRoute: ProtectedLibraryRoute,
+  ProtectedProfileRoute: ProtectedProfileRoute,
+  ProtectedEditorEditorIdRoute: ProtectedEditorEditorIdRoute,
+}
+
+const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
+  ProtectedRouteRouteChildren,
+)
+
 interface authAuthRouteChildren {
   authAuthAuthSigninRoute: typeof authAuthAuthSigninRoute
   authAuthAuthSignupRoute: typeof authAuthAuthSignupRoute
@@ -232,48 +263,31 @@ const authRouteChildren: authRouteChildren = {
 
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
-interface privatePRouteChildren {
-  privatePProfileRoute: typeof privatePProfileRoute
-}
-
-const privatePRouteChildren: privatePRouteChildren = {
-  privatePProfileRoute: privatePProfileRoute,
-}
-
-const privatePRouteWithChildren = privatePRoute._addFileChildren(
-  privatePRouteChildren,
-)
-
-interface privateRouteChildren {
-  privatePRoute: typeof privatePRouteWithChildren
-}
-
-const privateRouteChildren: privateRouteChildren = {
-  privatePRoute: privatePRouteWithChildren,
-}
-
-const privateRouteWithChildren =
-  privateRoute._addFileChildren(privateRouteChildren)
-
 export interface FileRoutesByFullPath {
-  '/': typeof privatePRouteWithChildren
+  '/': typeof authAuthRouteWithChildren
+  '': typeof ProtectedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/pricing': typeof PricingRoute
-  '/profile': typeof privatePProfileRoute
+  '/library': typeof ProtectedLibraryRoute
+  '/profile': typeof ProtectedProfileRoute
+  '/editor/$editorId': typeof ProtectedEditorEditorIdRoute
   '/auth/signin': typeof authAuthAuthSigninRoute
   '/auth/signup': typeof authAuthAuthSignupRoute
   '/google/callback': typeof authAuthGoogleCallbackRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof privatePRouteWithChildren
+  '/': typeof authAuthRouteWithChildren
+  '': typeof ProtectedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/pricing': typeof PricingRoute
-  '/profile': typeof privatePProfileRoute
+  '/library': typeof ProtectedLibraryRoute
+  '/profile': typeof ProtectedProfileRoute
+  '/editor/$editorId': typeof ProtectedEditorEditorIdRoute
   '/auth/signin': typeof authAuthAuthSigninRoute
   '/auth/signup': typeof authAuthAuthSignupRoute
   '/google/callback': typeof authAuthGoogleCallbackRoute
@@ -282,15 +296,16 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_protected': typeof ProtectedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/pricing': typeof PricingRoute
   '/(auth)': typeof authRouteWithChildren
   '/(auth)/_auth': typeof authAuthRouteWithChildren
-  '/(private)': typeof privateRouteWithChildren
-  '/(private)/_p': typeof privatePRouteWithChildren
-  '/(private)/_p/profile': typeof privatePProfileRoute
+  '/_protected/library': typeof ProtectedLibraryRoute
+  '/_protected/profile': typeof ProtectedProfileRoute
+  '/_protected/editor/$editorId': typeof ProtectedEditorEditorIdRoute
   '/(auth)/_auth/auth/signin': typeof authAuthAuthSigninRoute
   '/(auth)/_auth/auth/signup': typeof authAuthAuthSignupRoute
   '/(auth)/_auth/google/callback': typeof authAuthGoogleCallbackRoute
@@ -300,37 +315,44 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | ''
     | '/about'
     | '/contact'
     | '/features'
     | '/pricing'
+    | '/library'
     | '/profile'
+    | '/editor/$editorId'
     | '/auth/signin'
     | '/auth/signup'
     | '/google/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | ''
     | '/about'
     | '/contact'
     | '/features'
     | '/pricing'
+    | '/library'
     | '/profile'
+    | '/editor/$editorId'
     | '/auth/signin'
     | '/auth/signup'
     | '/google/callback'
   id:
     | '__root__'
     | '/'
+    | '/_protected'
     | '/about'
     | '/contact'
     | '/features'
     | '/pricing'
     | '/(auth)'
     | '/(auth)/_auth'
-    | '/(private)'
-    | '/(private)/_p'
-    | '/(private)/_p/profile'
+    | '/_protected/library'
+    | '/_protected/profile'
+    | '/_protected/editor/$editorId'
     | '/(auth)/_auth/auth/signin'
     | '/(auth)/_auth/auth/signup'
     | '/(auth)/_auth/google/callback'
@@ -339,22 +361,22 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
   PricingRoute: typeof PricingRoute
   authRoute: typeof authRouteWithChildren
-  privateRoute: typeof privateRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
   PricingRoute: PricingRoute,
   authRoute: authRouteWithChildren,
-  privateRoute: privateRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -368,16 +390,24 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/_protected",
         "/about",
         "/contact",
         "/features",
         "/pricing",
-        "/(auth)",
-        "/(private)"
+        "/(auth)"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/_protected": {
+      "filePath": "_protected/route.tsx",
+      "children": [
+        "/_protected/library",
+        "/_protected/profile",
+        "/_protected/editor/$editorId"
+      ]
     },
     "/about": {
       "filePath": "about.tsx"
@@ -406,22 +436,17 @@ export const routeTree = rootRoute
         "/(auth)/_auth/google/callback"
       ]
     },
-    "/(private)": {
-      "filePath": "(private)",
-      "children": [
-        "/(private)/_p"
-      ]
+    "/_protected/library": {
+      "filePath": "_protected/library.tsx",
+      "parent": "/_protected"
     },
-    "/(private)/_p": {
-      "filePath": "(private)/_p.tsx",
-      "parent": "/(private)",
-      "children": [
-        "/(private)/_p/profile"
-      ]
+    "/_protected/profile": {
+      "filePath": "_protected/profile.tsx",
+      "parent": "/_protected"
     },
-    "/(private)/_p/profile": {
-      "filePath": "(private)/_p.profile.tsx",
-      "parent": "/(private)/_p"
+    "/_protected/editor/$editorId": {
+      "filePath": "_protected/editor/$editorId.tsx",
+      "parent": "/_protected"
     },
     "/(auth)/_auth/auth/signin": {
       "filePath": "(auth)/_auth.auth.signin.tsx",
