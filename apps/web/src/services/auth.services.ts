@@ -6,7 +6,7 @@ import { getSession } from "@/lib/getSession";
 type TAuthResponse = TApiResponse<{ accessToken: string }>;
 
 const authApi = axios.create({
-  baseURL: "http://localhost:3001/auth",
+  baseURL: "/api/v1/auth",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
