@@ -5,8 +5,10 @@ import { useNavigate } from "@tanstack/react-router";
 import { removeDataFromLocalStorage } from "@/lib/localStorage";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userSignin, userSignout, userSignup } from "@/services/auth.services";
+import { useSearchParams } from "./useSearchParams";
 
 export const useSession = () => {
+  const [callback] = useSearchParams(["callback"]);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -26,7 +28,11 @@ export const useSession = () => {
     mutationKey: ["user", "signin"],
     mutationFn: userSignin,
     onSuccess: () => {
-      navigate({ to: "/", reloadDocument: true });
+      if (callback) {
+        navigate({ to: callback, reloadDocument: true });
+      } else {
+        navigate({ to: "/", reloadDocument: true });
+      }
       queryClient.invalidateQueries({ queryKey: ["user", "me"] });
     },
     onError: (error) => {
@@ -38,7 +44,11 @@ export const useSession = () => {
     mutationKey: ["user", "logout"],
     mutationFn: userSignout,
     onSuccess: () => {
-      navigate({ to: "/", reloadDocument: true });
+      if (callback) {
+        navigate({ to: callback, reloadDocument: true });
+      } else {
+        navigate({ to: "/", reloadDocument: true });
+      }
       queryClient.setQueryData(["user", "me"], null);
 
       queryClient.clear();
