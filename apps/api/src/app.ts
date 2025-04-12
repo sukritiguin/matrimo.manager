@@ -14,13 +14,9 @@ app.use(express.urlencoded({ extended: true, limit: "32kb" }));
 app.use(express.static("public"));
 
 // Routes
-import healthCheckRoute from "./routes/healthCheck.routes.js";
-import authRoutes from "./routes/auth.routes.js";
-import usersRoutes from "./routes/users.routes.js";
+import v1Routes from "routes/index.js";
 
-app.use("/healthy", healthCheckRoute);
-app.use("/auth", authRoutes);
-app.use("/users", usersRoutes);
+app.use("/api/v1", v1Routes);
 
 // Error handle
 import { errorConverter, errorHandler, notFound } from "@matrimo/lib/api";
