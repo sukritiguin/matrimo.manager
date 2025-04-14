@@ -130,6 +130,9 @@ model Canvas {
     title String? @db.VarChar(255)
     data  Json
 
+    width  Int
+    height Int
+
     revokedAt DateTime?
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
