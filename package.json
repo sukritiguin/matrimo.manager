@@ -6,6 +6,7 @@
     "dev:server": "turbo dev --filter=server",
     "dev:client": "turbo dev --filter=client",
     "dev": "turbo dev",
+    "dev-apps": "turbo dev --filter=./apps/*",
     "format": "prettier --write \"**/*.{ts,tsx,css,html}\"",
     "db:dev:up": "docker compose up matrimo-db -d",
     "db:dev:stop": "docker compose stop matrimo-db",
