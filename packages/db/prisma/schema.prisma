@@ -136,7 +136,7 @@ model Canvas {
     revokedAt DateTime?
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
-    event     Event[]
+    events    Event[]
     userId    Int
     user      User      @relation(fields: [userId], references: [id])
 
@@ -149,14 +149,13 @@ enum EventType {
     BIRTHDAY
     ANNIVERSARY
     RICE_CEREMONY
-    CUSTOM
     OTHER
 }
 
 model EventCategory {
     id          Int       @id @default(autoincrement())
     name        String
-    eventType   EventType
+    eventType   EventType @unique
     customEvent String?
     events      Event[]
     createdAt   DateTime  @default(now())
@@ -179,11 +178,11 @@ model Event {
     updatedAt DateTime  @updatedAt
 
     ownerId    Int
-    canvasId   String
+    canvasId   String?
     categoryId Int
     owner      User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-    canvas     Canvas        @relation(fields: [canvasId], references: [id], onDelete: Cascade)
-    category   EventCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+    canvas     Canvas?       @relation(fields: [canvasId], references: [id], onDelete: Cascade)
+    category   EventCategory @relation(fields: [categoryId], references: [id])
 
     @@index([canvasId])
     @@index([ownerId, canvasId])
