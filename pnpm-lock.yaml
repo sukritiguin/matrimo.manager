@@ -282,6 +282,9 @@ importers:
 
   packages/schemas:
     dependencies:
+      '@matrimo/db':
+        specifier: workspace:*
+        version: link:../db
       zod:
         specifier: ^3.24.2
         version: 3.24.2
