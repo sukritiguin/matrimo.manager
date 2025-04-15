@@ -9,7 +9,8 @@
     "db-push": "prisma db push",
     "db-migrate": "prisma migrate dev",
     "prisma-studio": "prisma studio --browser none",
-    "dev": "pnpm prisma-studio"
+    "dev": "pnpm prisma-studio",
+    "postinstall": "pnpm prisma generate"
   },
   "exports": {
     ".": "./dist/index.js",
@@ -19,11 +20,11 @@
   "author": "Subhajit Pramanik",
   "license": "ISC",
   "devDependencies": {
-    "prisma": "^6.3.0",
-    "typescript": "^5.8.2"
+    "prisma": "^6.6.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@prisma/client": "^6.3.0",
+    "@prisma/client": "^6.6.0",
     "dot-env": "^0.0.1"
   }
 }

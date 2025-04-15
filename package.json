@@ -26,10 +26,10 @@
   },
   "homepage": "https://github.com/sukritiguin/matrimo.manager#readme",
   "devDependencies": {
-    "prettier": "^3.5.1",
     "husky": "^8.0.3",
-    "lint-staged": "^15.4.3",
-    "turbo": "^2.4.4"
+    "lint-staged": "^15.5.1",
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.0"
   },
   "packageManager": "pnpm@9.0.0"
 }
