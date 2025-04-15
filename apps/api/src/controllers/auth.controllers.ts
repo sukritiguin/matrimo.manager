@@ -249,7 +249,7 @@ export const googleCallback = apiHandler(
           data: {
             email,
             name,
-            account: {
+            accounts: {
               create: {
                 provider: "google",
                 providerAccountId: googleId,
