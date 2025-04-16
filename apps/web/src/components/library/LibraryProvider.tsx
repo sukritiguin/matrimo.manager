@@ -7,35 +7,8 @@ import { useForm } from "react-hook-form";
 import { CANVAS_PRESETS } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { sleep } from "@/lib/utils";
-
-const Categories = [
-  "Wedding",
-  "Birthday",
-  "Anniversary",
-  "Rice Ceremony",
-  "Other",
-] as const;
-
-const categorySchema = z
-  .object({
-    type: z.enum(Categories),
-    other: z.string().optional(),
-  })
-  .refine((data) => (data.type === "Other" ? !!data.other : true), {
-    message: "Other is required",
-    path: ["other"],
-  });
-
-const createEventSchema = z.object({
-  dimension: z.enum(
-    CANVAS_PRESETS.map((preset) => preset.id) as [string, ...string[]]
-  ),
-  title: z.string({ message: "Title is required" }).default("Untitled Event"),
-  description: z.string({ message: "Description is required" }),
-  tags: z.array(z.string().min(3, "Tag must be at least 3 characters long")),
-  category: categorySchema,
-});
+import { createEventSchema, EVENT_CATEGORIES } from "@/schemas/events.schema";
+import { createNewEvent } from "@/services/events.services";
 
 export const LibraryProvider = createReactContext(() => {
   const navigate = useNavigate();
@@ -69,9 +42,7 @@ export const LibraryProvider = createReactContext(() => {
   const { mutate: onSubmitNewEvent, isPending: isCreatingNewEvent } =
     useMutation({
       mutationKey: ["events", "create"],
-      mutationFn: async (data: z.infer<typeof createEventSchema>) =>
-        sleep(5000).then(() => data),
-
+      mutationFn: createNewEvent,
       onSuccess: () => {},
       onSettled: () => {
         createNewEventForm.reset();
@@ -92,7 +63,7 @@ export const LibraryProvider = createReactContext(() => {
     handleCreateNewEvent,
     openNewEventModal,
     setOpenNewEventModal,
-    Categories,
+    Categories: EVENT_CATEGORIES,
     isCreatingNewEvent,
   };
 });

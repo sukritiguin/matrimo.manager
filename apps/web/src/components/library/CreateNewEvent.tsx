@@ -176,7 +176,7 @@ export function NewEventSettingsModal({
                     <FormLabel>Tags</FormLabel>
                     <FormControl>
                       <TagsInput
-                        value={field.value}
+                        value={field.value || []}
                         onValueChange={field.onChange}
                       />
                     </FormControl>
@@ -185,10 +185,12 @@ export function NewEventSettingsModal({
                 )}
               />
 
-                <Button type="submit" variant="focus">
-                  {isCreatingNewEvent && <Loader2 className="animate-spin size-4" />}
-                  Submit
-                </Button>
+              <Button type="submit" variant="focus">
+                {isCreatingNewEvent && (
+                  <Loader2 className="animate-spin size-4" />
+                )}
+                Submit
+              </Button>
               <DialogFooter>
                 <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>
