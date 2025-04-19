@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ApiError, apiHandler, ApiResponse, zodValidation } from "@matrimo/lib";
 import { client, EventType } from "@matrimo/db";
 import { logger } from "utils/logger.js";
-import { createEventSchema, eventParamsSchema } from "@matrimo/schemas";
+import { createEventSchema, eventParamsSchema, updateEventSchema } from "@matrimo/schemas";
 import { createCanvas } from "data/canvas.data.js";
 import { getEventById } from "data/event.data.js";
 import { paginationSchema } from "validations/pagination.schema.js";
@@ -104,9 +104,7 @@ const createEvent = apiHandler(async (req: Request, res: Response) => {
       ...Options.eventOptions,
     });
 
-    return res
-      .status(201)
-      .json(new ApiResponse(true, "Event created", { event }));
+    return res.status(201).json(new ApiResponse(true, "Event created", { event }));
   } catch (error) {
     logger.error("Error creating event:", error);
     if (error instanceof ApiError) throw error;
@@ -138,7 +136,7 @@ const getEvent = apiHandler(async (req: Request, res: Response) => {
 const updateEventById = apiHandler(async (req: Request, res: Response) => {
   try {
     const { eventId } = zodValidation(eventParamsSchema, req.params);
-    const data = zodValidation(createEventSchema, req.body);
+    const data = zodValidation(updateEventSchema, req.body);
 
     const event = await client.event.findUnique({
       where: {
@@ -154,22 +152,6 @@ const updateEventById = apiHandler(async (req: Request, res: Response) => {
       throw new ApiError(401, "Unauthorized user");
     }
 
-    let eventType = data.category.type as EventType;
-
-    const category = await client.eventCategory.upsert({
-      where: {
-        eventType,
-      },
-      create: {
-        name: data.category.type,
-        eventType,
-      },
-      update: {
-        name: data.category.type,
-        eventType,
-      },
-    });
-
     const updatedEvent = await client.event.update({
       where: {
         id: eventId,
@@ -178,7 +160,6 @@ const updateEventById = apiHandler(async (req: Request, res: Response) => {
         title: data.title,
         description: data.description,
         tags: data.tags,
-        categoryId: category.id,
       },
     });
 
@@ -216,9 +197,7 @@ const deleteEventById = apiHandler(async (req: Request, res: Response) => {
       },
     });
 
-    return res
-      .status(200)
-      .json(ApiResponse.success("Event delete successfully"));
+    return res.status(200).json(ApiResponse.success("Event delete successfully"));
   } catch (error) {
     logger.error("Error deleteing event:", error);
     if (error instanceof ApiError) throw error;
@@ -256,9 +235,7 @@ const copyEvent = apiHandler(async (req: Request, res: Response) => {
       },
     });
 
-    return res
-      .status(200)
-      .json(ApiResponse.success("Event copied successfully", { newEvent }));
+    return res.status(200).json(ApiResponse.success("Event copied successfully", { newEvent }));
   } catch (error) {
     logger.error("Error copying event:", error);
     if (error instanceof ApiError) throw error;
@@ -274,9 +251,7 @@ const getArchivedEvents = apiHandler(async (req: Request, res: Response) => {
         isArchive: true,
       },
     });
-    return res
-      .status(200)
-      .json(ApiResponse.success("Archived events", { archivedEvents }));
+    return res.status(200).json(ApiResponse.success("Archived events", { archivedEvents }));
   } catch (error) {
     logger.error("Error getting archived events:", error);
     if (error instanceof ApiError) throw error;
@@ -292,9 +267,7 @@ const getArchivedEvent = apiHandler(async (req: Request, res: Response) => {
         id: eventId,
       },
     });
-    return res
-      .status(200)
-      .json(ApiResponse.success("Archived event", { archivedEvent }));
+    return res.status(200).json(ApiResponse.success("Archived event", { archivedEvent }));
   } catch (error) {
     logger.error("Error getting archived event:", error);
     if (error instanceof ApiError) throw error;
@@ -313,9 +286,7 @@ const toggleArchive = apiHandler(async (req: Request, res: Response) => {
         isArchive: !req.body.isArchive,
       },
     });
-    return res
-      .status(200)
-      .json(ApiResponse.success("Archived event", { archivedEvent }));
+    return res.status(200).json(ApiResponse.success("Archived event", { archivedEvent }));
   } catch (error) {
     logger.error("Error getting archived event:", error);
     if (error instanceof ApiError) throw error;
@@ -331,9 +302,7 @@ const deleteArchivedEvent = apiHandler(async (req: Request, res: Response) => {
         id: eventId,
       },
     });
-    return res
-      .status(200)
-      .json(ApiResponse.success("Archived event", { archivedEvent }));
+    return res.status(200).json(ApiResponse.success("Archived event", { archivedEvent }));
   } catch (error) {
     logger.error("Error getting archived event:", error);
     if (error instanceof ApiError) throw error;
