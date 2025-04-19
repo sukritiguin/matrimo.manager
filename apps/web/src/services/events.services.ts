@@ -44,7 +44,7 @@ const updateEvent = (
     event: TEvent;
   }>
 > => {
-  return api.patch(`/events/${id}`, data);
+  return api.put(`/events/${id}`, data);
 };
 
 const deleteEvent = (id: string) => {
