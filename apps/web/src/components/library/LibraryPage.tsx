@@ -92,45 +92,55 @@ export const LibraryPage = () => {
         </Button>
       </div>
       <div className="flex w-full gap-6 mt-8">
-        {data.events.map((event, index) => (
-          <motion.div
-            key={event.id}
-            layoutId={`event-${event.id}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, zIndex: 10 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.button
-              className="relative flex flex-col items-center justify-center hover:cursor-pointer rounded-md"
-              onMouseEnter={() => setShowOverlay(event)}
-              onMouseLeave={() => setShowOverlay(null)}
-              onClick={() => handleEventClick(event)}
+        {data.events.length > 0 ? (
+          data.events.map((event, index) => (
+            <motion.div
+              key={event.id}
+              layoutId={`event-${event.id}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, zIndex: 10 }}
+              exit={{ opacity: 0 }}
             >
-              <motion.img
-                layoutId={`image-${event.id}`}
-                // FIXME: Replace with real image
-                src={"https://fakeimg.pl/400x600?text=matrimo"}
-                alt={event.title + event.id}
-                className="flex rounded-md w-48 [aspect-ratio:3/4] object-cover"
-                loading="lazy"
-              />
-              <motion.div layoutId={`text-${event.id}`} className="flex w-full gap-2 p-1 text-base">
-                <h3 className="text-sm text-muted-foreground">
-                  Created by: {event.owner.username ?? "Unknown"}
-                </h3>
-              </motion.div>
-              <AnimatePresence>
-                {showOverlay === event && (
-                  <motion.div className="absolute flex inset-0 rounded-md bg-muted/20 w-full h-full">
-                    <div className="p-2 flex flex-col w-full items-center justify-center">
-                      <h2 className="font-semibold text-black">{event.title}</h2>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          </motion.div>
-        ))}
+              <motion.button
+                className="relative flex flex-col items-center justify-center hover:cursor-pointer rounded-md"
+                onMouseEnter={() => setShowOverlay(event)}
+                onMouseLeave={() => setShowOverlay(null)}
+                onClick={() => handleEventClick(event)}
+              >
+                <motion.img
+                  layoutId={`image-${event.id}`}
+                  // FIXME: Replace with real image
+                  src={"https://fakeimg.pl/400x600?text=matrimo"}
+                  alt={event.title + event.id}
+                  className="flex rounded-md w-48 [aspect-ratio:3/4] object-cover"
+                  loading="lazy"
+                />
+                <motion.div
+                  layoutId={`text-${event.id}`}
+                  className="flex w-full gap-2 p-1 text-base"
+                >
+                  <h3 className="text-sm text-muted-foreground">
+                    Created by: {event.owner.username ?? "Unknown"}
+                  </h3>
+                </motion.div>
+                <AnimatePresence>
+                  {showOverlay === event && (
+                    <motion.div className="absolute flex inset-0 rounded-md bg-muted/20 w-full h-full">
+                      <div className="p-2 flex flex-col w-full items-center justify-center">
+                        <h2 className="font-semibold text-black">{event.title}</h2>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </motion.div>
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-2 w-full border border-dashed rounded-md p-4 h-60 bg-muted">
+            <p className="font-semibold text-xl">No events found</p>
+            <p className="text-sm text-muted-foreground">Create your first event or template!</p>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -9,8 +9,7 @@
     "db-push": "prisma db push",
     "db-migrate": "prisma migrate dev",
     "prisma-studio": "prisma studio --browser none",
-    "dev": "pnpm prisma-studio",
-    "postinstall": "pnpm prisma generate"
+    "dev": "pnpm prisma-studio"
   },
   "exports": {
     ".": "./dist/index.js",

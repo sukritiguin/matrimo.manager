@@ -51,13 +51,9 @@ export function NewEventSettingsModal({
         <DialogOverlay />
         <DialogContent className="">
           <DialogHeader>
-            <DialogTitle className="text-orange-500">
-              Create new event
-            </DialogTitle>
+            <DialogTitle className="text-orange-500">Create new event</DialogTitle>
           </DialogHeader>
-          <DialogDescription>
-            You can add a description, tags, and a category.
-          </DialogDescription>
+          <DialogDescription>You can add a description, tags, and a category.</DialogDescription>
 
           <Form {...form}>
             <form
@@ -72,10 +68,7 @@ export function NewEventSettingsModal({
                     <FormItem>
                       <FormLabel>Dimension</FormLabel>
                       <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="select dimension" />
                           </SelectTrigger>
@@ -130,10 +123,7 @@ export function NewEventSettingsModal({
                     <FormItem>
                       <FormLabel>Category</FormLabel>
                       <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="select category" />
                           </SelectTrigger>
@@ -175,10 +165,7 @@ export function NewEventSettingsModal({
                   <FormItem>
                     <FormLabel>Tags</FormLabel>
                     <FormControl>
-                      <TagsInput
-                        value={field.value || []}
-                        onValueChange={field.onChange}
-                      />
+                      <TagsInput value={field.value || []} onValueChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -186,15 +173,13 @@ export function NewEventSettingsModal({
               />
 
               <Button type="submit" variant="focus">
-                {isCreatingNewEvent && (
-                  <Loader2 className="animate-spin size-4" />
-                )}
+                {isCreatingNewEvent && <Loader2 className="animate-spin size-4" />}
                 Submit
               </Button>
               <DialogFooter>
-                <DialogClose asChild>
+                {/* <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>
-                </DialogClose>
+                </DialogClose> */}
               </DialogFooter>
             </form>
           </Form>

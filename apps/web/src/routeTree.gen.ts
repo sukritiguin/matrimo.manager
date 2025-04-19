@@ -19,10 +19,10 @@ import { Route as ContactImport } from './routes/contact'
 import { Route as AboutImport } from './routes/about'
 import { Route as ProtectedRouteImport } from './routes/_protected/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as EditorEditorIdImport } from './routes/editor/$editorId'
 import { Route as ProtectedProfileImport } from './routes/_protected/profile'
 import { Route as ProtectedLibraryImport } from './routes/_protected/library'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
-import { Route as ProtectedEditorEditorIdImport } from './routes/_protected/editor/$editorId'
 import { Route as authAuthGoogleCallbackImport } from './routes/(auth)/_auth.google.callback'
 import { Route as authAuthAuthSignupImport } from './routes/(auth)/_auth.auth.signup'
 import { Route as authAuthAuthSigninImport } from './routes/(auth)/_auth.auth.signin'
@@ -73,6 +73,12 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const EditorEditorIdRoute = EditorEditorIdImport.update({
+  id: '/editor/$editorId',
+  path: '/editor/$editorId',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ProtectedProfileRoute = ProtectedProfileImport.update({
   id: '/profile',
   path: '/profile',
@@ -88,12 +94,6 @@ const ProtectedLibraryRoute = ProtectedLibraryImport.update({
 const authAuthRoute = authAuthImport.update({
   id: '/_auth',
   getParentRoute: () => authRoute,
-} as any)
-
-const ProtectedEditorEditorIdRoute = ProtectedEditorEditorIdImport.update({
-  id: '/editor/$editorId',
-  path: '/editor/$editorId',
-  getParentRoute: () => ProtectedRouteRoute,
 } as any)
 
 const authAuthGoogleCallbackRoute = authAuthGoogleCallbackImport.update({
@@ -188,12 +188,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedProfileImport
       parentRoute: typeof ProtectedRouteImport
     }
-    '/_protected/editor/$editorId': {
-      id: '/_protected/editor/$editorId'
+    '/editor/$editorId': {
+      id: '/editor/$editorId'
       path: '/editor/$editorId'
       fullPath: '/editor/$editorId'
-      preLoaderRoute: typeof ProtectedEditorEditorIdImport
-      parentRoute: typeof ProtectedRouteImport
+      preLoaderRoute: typeof EditorEditorIdImport
+      parentRoute: typeof rootRoute
     }
     '/(auth)/_auth/auth/signin': {
       id: '/(auth)/_auth/auth/signin'
@@ -224,13 +224,11 @@ declare module '@tanstack/react-router' {
 interface ProtectedRouteRouteChildren {
   ProtectedLibraryRoute: typeof ProtectedLibraryRoute
   ProtectedProfileRoute: typeof ProtectedProfileRoute
-  ProtectedEditorEditorIdRoute: typeof ProtectedEditorEditorIdRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedLibraryRoute: ProtectedLibraryRoute,
   ProtectedProfileRoute: ProtectedProfileRoute,
-  ProtectedEditorEditorIdRoute: ProtectedEditorEditorIdRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
@@ -272,7 +270,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/library': typeof ProtectedLibraryRoute
   '/profile': typeof ProtectedProfileRoute
-  '/editor/$editorId': typeof ProtectedEditorEditorIdRoute
+  '/editor/$editorId': typeof EditorEditorIdRoute
   '/auth/signin': typeof authAuthAuthSigninRoute
   '/auth/signup': typeof authAuthAuthSignupRoute
   '/google/callback': typeof authAuthGoogleCallbackRoute
@@ -287,7 +285,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/library': typeof ProtectedLibraryRoute
   '/profile': typeof ProtectedProfileRoute
-  '/editor/$editorId': typeof ProtectedEditorEditorIdRoute
+  '/editor/$editorId': typeof EditorEditorIdRoute
   '/auth/signin': typeof authAuthAuthSigninRoute
   '/auth/signup': typeof authAuthAuthSignupRoute
   '/google/callback': typeof authAuthGoogleCallbackRoute
@@ -305,7 +303,7 @@ export interface FileRoutesById {
   '/(auth)/_auth': typeof authAuthRouteWithChildren
   '/_protected/library': typeof ProtectedLibraryRoute
   '/_protected/profile': typeof ProtectedProfileRoute
-  '/_protected/editor/$editorId': typeof ProtectedEditorEditorIdRoute
+  '/editor/$editorId': typeof EditorEditorIdRoute
   '/(auth)/_auth/auth/signin': typeof authAuthAuthSigninRoute
   '/(auth)/_auth/auth/signup': typeof authAuthAuthSignupRoute
   '/(auth)/_auth/google/callback': typeof authAuthGoogleCallbackRoute
@@ -352,7 +350,7 @@ export interface FileRouteTypes {
     | '/(auth)/_auth'
     | '/_protected/library'
     | '/_protected/profile'
-    | '/_protected/editor/$editorId'
+    | '/editor/$editorId'
     | '/(auth)/_auth/auth/signin'
     | '/(auth)/_auth/auth/signup'
     | '/(auth)/_auth/google/callback'
@@ -367,6 +365,7 @@ export interface RootRouteChildren {
   FeaturesRoute: typeof FeaturesRoute
   PricingRoute: typeof PricingRoute
   authRoute: typeof authRouteWithChildren
+  EditorEditorIdRoute: typeof EditorEditorIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -377,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesRoute: FeaturesRoute,
   PricingRoute: PricingRoute,
   authRoute: authRouteWithChildren,
+  EditorEditorIdRoute: EditorEditorIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -395,7 +395,8 @@ export const routeTree = rootRoute
         "/contact",
         "/features",
         "/pricing",
-        "/(auth)"
+        "/(auth)",
+        "/editor/$editorId"
       ]
     },
     "/": {
@@ -405,8 +406,7 @@ export const routeTree = rootRoute
       "filePath": "_protected/route.tsx",
       "children": [
         "/_protected/library",
-        "/_protected/profile",
-        "/_protected/editor/$editorId"
+        "/_protected/profile"
       ]
     },
     "/about": {
@@ -444,9 +444,8 @@ export const routeTree = rootRoute
       "filePath": "_protected/profile.tsx",
       "parent": "/_protected"
     },
-    "/_protected/editor/$editorId": {
-      "filePath": "_protected/editor/$editorId.tsx",
-      "parent": "/_protected"
+    "/editor/$editorId": {
+      "filePath": "editor/$editorId.tsx"
     },
     "/(auth)/_auth/auth/signin": {
       "filePath": "(auth)/_auth.auth.signin.tsx",
