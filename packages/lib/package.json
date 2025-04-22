@@ -33,6 +33,10 @@
     "./api": {
       "require": "./dist/api/index.js",
       "import": "./dist/api/index.js"
+    },
+    "./aws": {
+      "require": "./dist/api/aws/index.js",
+      "import": "./dist/api/aws/index.js"
     }
   }
 }
