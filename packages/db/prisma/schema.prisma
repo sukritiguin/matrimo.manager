@@ -27,6 +27,7 @@ model User {
     sessions  Session[]
     events    Event[]
     canvases  Canvas[]
+    uploads   Upload[]
 
     @@map("users")
 }
@@ -118,7 +119,8 @@ model Image {
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
 
-    event Event[]
+    event   Event[]
+    uploads Upload[]
 
     @@index([fileKey])
     @@index([revokedAt])
@@ -189,4 +191,19 @@ model Event {
     @@index([isArchive])
     @@index([revokedAt])
     @@map("events")
+}
+
+model Upload {
+    id      String @id @default(cuid())
+    imageId String
+    image   Image  @relation(fields: [imageId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId Int
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([imageId])
+    @@map("uploads")
 }
