@@ -1,9 +1,0 @@
-model WishCard {
-  id      Int @unique    @id @default(autoincrement())
-  eventId Int
-  email   String
-  wish    String
-
-  Event Event @relation(fields: [eventId], references: [id])
-  User User @relation(fields: [email], references: [email])
-}

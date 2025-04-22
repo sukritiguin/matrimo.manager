@@ -1,9 +1,0 @@
-model Profile{
-    id Int @unique @default(autoincrement())
-    email String @id @unique
-    firstName String
-    lastName String
-    profilePicURL String
-
-    User User @relation(fields: [email], references: [email])
-}
