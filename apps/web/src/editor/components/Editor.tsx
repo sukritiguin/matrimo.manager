@@ -3,6 +3,7 @@ import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import MainCanvas from "./MainCanvas";
 import { PropertiesPanel } from "./properties";
+import { UploadPreview } from "./sidebar/UploadPreview";
 
 export const Editor: React.FC = () => {
   return (
@@ -10,6 +11,7 @@ export const Editor: React.FC = () => {
       {/* Header */}
       <Header />
       <div className="flex flex-1 w-full h-full pt-12">
+        <UploadPreview />
         <Sidebar />
         <div className="flex flex-1 items-center justify-center">
           <MainCanvas />

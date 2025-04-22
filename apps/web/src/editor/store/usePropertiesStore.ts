@@ -169,7 +169,7 @@ export const usePropertiesPanelStore = create<PropertiesStore>((set, get) => ({
             set({ copyObject: clonedObject as any });
             canvas.getActiveObjects().forEach((obj) => canvas.remove(obj));
             canvas.discardActiveObject();
-            set({ selectedObject: null});
+            set({ selectedObject: null });
           }
           break;
         default:
@@ -226,6 +226,7 @@ export const usePropertiesPanelStore = create<PropertiesStore>((set, get) => ({
       selectedObject: null,
       cursorPosition: null,
       isSelectedObjectMoving: false,
+      copyObject: null,
     }),
 }));
 
