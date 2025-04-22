@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { addShapeToCanvas } from "@/editor/fabric/fabric-utils";
 import { useEditorStore } from "@/editor/store/useEditorStore";
-import { itemVariants, PanelWrapper } from "./PanelWrapper";
+import {  PanelWrapper } from "./PanelWrapper";
 
 const ElementsPanel = () => {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -73,7 +73,6 @@ const ElementsPanel = () => {
       {shapeTypes.map((shapeType) => (
         <motion.div
           key={shapeType}
-          variants={itemVariants}
           className="flex flex-col items-center justify-center aspect-square w-full rounded-md"
           onClick={() => handleClickShape(shapeType)}
         >
