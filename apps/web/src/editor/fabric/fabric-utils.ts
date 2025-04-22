@@ -247,7 +247,7 @@ export const cloneSelectedObject = async (canvas: Canvas) => {
   }
 };
 
-export const deletedSelectedObject = async (canvas: Canvas) => {
+export const deletedSelectedObject = async (canvas: Canvas | null) => {
   if (!canvas) return;
 
   const activeObject = canvas.getActiveObject();
@@ -277,8 +277,6 @@ export const canvasSelectionCustomizeOptions = {
   setControlVisible: "onhover",
 };
 
-export const visibleControlPoints = ["tl", "tr", "bl", "br", "mtr"];
-export const controlPoints = ['tl', 'tr', 'bl', 'br', 'ml', 'mr', 'mt', 'mb', 'mtr'];
 
 export const customizeBoundingBox = (canvas: Canvas) => {
   if (!canvas) return;
@@ -288,9 +286,6 @@ export const customizeBoundingBox = (canvas: Canvas) => {
       if (e.target) {
         const object = e.target;
         object.set({ ...canvasSelectionCustomizeOptions });
-        controlPoints.forEach((control) => {
-          object.setControlVisible(control, visibleControlPoints.includes(control));
-        });
       }
     });
 
