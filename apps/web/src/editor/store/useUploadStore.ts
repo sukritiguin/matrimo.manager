@@ -7,6 +7,7 @@ interface UploadStoreState {
 
 interface UploadStoreActions {
   setPreviewImage: (url: Upload | null) => void;
+  reset: () => void;
 }
 
 const initialState: UploadStoreState = {
@@ -17,4 +18,6 @@ export const useUploadStore = create<UploadStoreState & UploadStoreActions>((set
   ...initialState,
 
   setPreviewImage: (url: Upload | null) => set({ previewImage: url }),
+
+  reset: () => set({ ...initialState }),
 }));

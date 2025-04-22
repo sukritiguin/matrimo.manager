@@ -7,6 +7,9 @@ import { queryOptions } from "@tanstack/react-query";
 import { Editor } from "@/editor/components/Editor";
 import { getEventById } from "@/services/events.services";
 import { useEditorStore } from "@/editor/store/useEditorStore";
+import { useSidebarStore } from "@/editor/store/useSidebarStore";
+import { useUploadStore } from "@/editor/store/useUploadStore";
+import { useObjectProperties } from "@/editor/store/usePropertiesStore";
 
 export const Route = createFileRoute("/editor/$editorId")({
   loader: ({ context, location, params }) => {
@@ -36,9 +39,17 @@ export const Route = createFileRoute("/editor/$editorId")({
 function EditorPage() {
   const { editorId } = useParams({ from: "/editor/$editorId" });
   const editor = useEditorStore();
+  const editorSidebar = useSidebarStore();
+  const uploadStore = useUploadStore();
+  const propertiesStore = useObjectProperties();
 
   useEffect(() => {
-    return () => editor.reset();
+    return () => {
+      editor.reset();
+      editorSidebar.reset();
+      uploadStore.reset();
+      propertiesStore.reset();
+    };
   }, []);
 
   if (editorId) {

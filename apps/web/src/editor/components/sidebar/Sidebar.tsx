@@ -1,66 +1,10 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Grid, Pencil, Settings, Type, Upload } from "lucide-react";
-import { cn } from "@/lib/utils";
-import ElementsPanel from "./ElementsPanel";
-import TextPanel from "./TextPanel";
-import UploadsPanel from "./UploadsPanel";
-import DrawingsPanel from "./DrawingsPanel";
-import SettingsPanel from "./SettingsPanel";
 import { Button } from "@/components/ui/button";
-
-interface ISidebarItem {
-  id: string;
-  icon: React.JSX.Element;
-  label: string;
-  panel: () => React.ReactNode;
-}
-
-const SidebarItems: ISidebarItem[] = [
-  {
-    id: "elements",
-    icon: <Grid className="size-4" />,
-    label: "Elements",
-    panel: () => <ElementsPanel />,
-  },
-  {
-    id: "text",
-    icon: <Type className="size-4" />,
-    label: "Text",
-    panel: () => <TextPanel />,
-  },
-  {
-    id: "uploads",
-    icon: <Upload className="size-4" />,
-    label: "Uploads",
-    panel: () => <UploadsPanel />,
-  },
-  {
-    id: "draw",
-    icon: <Pencil className="size-4" />,
-    label: "Draw",
-    panel: () => <DrawingsPanel />,
-  },
-  {
-    id: "settings",
-    icon: <Settings className="size-4" />,
-    label: "Settings",
-    panel: () => <SettingsPanel />,
-  },
-] as const;
-
-type TSidebarId = (typeof SidebarItems)[number]["id"];
+import { SidebarItems, useSidebarStore } from "@/editor/store/useSidebarStore";
 
 export const Sidebar: React.FC = () => {
-  const [activeItem, setActiveItem] = React.useState<TSidebarId | null>(SidebarItems[0].id);
-
-  const handleClickSidebarItem = (id: TSidebarId) => {
-    if (activeItem === id) {
-      setActiveItem(null);
-    } else {
-      setActiveItem(id);
-    }
-  };
+  const { activeItem, onChangeActiveItem } = useSidebarStore();
 
   return (
     <div className="flex h-full">
@@ -68,11 +12,11 @@ export const Sidebar: React.FC = () => {
         <div className="flex flex-col gap-6 py-6">
           {SidebarItems.map((item) => (
             <Button
-            key={item.id}
+              key={item.id}
               className="relative"
               variant="outline"
               size="icon"
-              onClick={() => handleClickSidebarItem(item.id)}
+              onClick={() => onChangeActiveItem(item.id)}
             >
               {activeItem === item.id && (
                 <motion.div
@@ -86,15 +30,13 @@ export const Sidebar: React.FC = () => {
         </div>
       </motion.aside>
 
-      <AnimatePresence>{activeItem && <SidebarPanel activeItem={activeItem} />}</AnimatePresence>
+      <AnimatePresence>{activeItem && <SidebarPanel />}</AnimatePresence>
     </div>
   );
 };
 
-const SidebarPanel: React.FC<{
-  activeItem: TSidebarId;
-}> = ({ activeItem }) => {
-  const item = SidebarItems.find((item) => item.id === activeItem);
+const SidebarPanel: React.FC = () => {
+  const item = SidebarItems.find((item) => item.id === useSidebarStore.getState().activeItem);
 
   if (!item) {
     return null;
