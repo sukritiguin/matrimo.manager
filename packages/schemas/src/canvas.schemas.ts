@@ -15,7 +15,13 @@ const createCanvasSchema = z.object({
   canvasData: z.object({}).or(z.string()).optional(),
 });
 
-const canvasDataSchema = z.object({}).or(z.string());
+const canvasDataSchema = z
+  .object({
+    version: z.string(),
+    background: z.string(),
+    objects: z.array(z.any()),
+  })
+  .or(z.string());
 
 const updateCanvasSchema = createCanvasSchema.partial();
 

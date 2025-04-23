@@ -6,9 +6,9 @@ const router: Router = Router();
 
 router.use(authenticate);
 
-router.get("/:canvasId", CanvasController.get);
-router.post("/:canvasId", CanvasController.create);
-router.patch("/:canvasId", CanvasController.update);
-router.patch("/:canvasId/data", CanvasController.canvasDataUpdate);
+router.get("/:id", CanvasController.get);
+router.post("/:id", CanvasController.create);
+router.patch("/:id", CanvasController.update);
+router.patch("/:id/data", CanvasController.canvasDataUpdate);
 
 export default router;
