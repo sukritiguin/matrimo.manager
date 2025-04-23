@@ -14,13 +14,16 @@ const getUploads = apiHandler(async (req: Request, res: Response) => {
       throw new ApiError(401, "Unauthorized");
     }
 
-    const { limit, page } = req.query;
+    const { limit, page, order } = zodValidation(paginationSchema, req.query);
     const uploads = await client.upload.findMany({
       where: {
         userId,
       },
-      take: Number(limit) || 10,
-      skip: (Number(page) - 1) * (Number(limit) || 10),
+      take: limit,
+      skip: (page - 1) * limit,
+      orderBy: {
+        createdAt: order,
+      },
       include: {
         image: true,
       },
@@ -31,7 +34,7 @@ const getUploads = apiHandler(async (req: Request, res: Response) => {
         userId,
       },
     });
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / (Number(limit) || 10));
     const response = new ApiResponse(true, "Uploads fetched successfully", {
       uploads,
       meta: {
