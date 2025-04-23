@@ -58,6 +58,7 @@ export const useUploads = () => {
   const handleClickToAddImage = (url: string) => {
     try {
       addImageToCanvas(canvas!, url);
+      setPreviewImage(null);
     } catch (error) {
       console.error("Error adding image to canvas:", error);
     }
