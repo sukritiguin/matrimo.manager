@@ -112,7 +112,7 @@ const MainCanvas = () => {
         setSelectedObject(activeSelection as any);
 
         DISABLED_CONTROLS.forEach((control) => {
-          activeSelection.setControlVisible(control, false);
+          activeSelection.controls[control].visible = false;
         });
 
         activeSelection.set({
