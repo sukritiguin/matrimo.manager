@@ -12,10 +12,15 @@ import { useObjectProperties } from "@/editor/store/usePropertiesStore";
 import { StyleSection } from "./StyleSection";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
+import { TextSection } from "./TextSection";
+import { isTextObject } from "@/editor/constants";
 
 export const PropertiesPanel: React.FC = () => {
   const { showPropertiesPanel } = useEditorStore();
   const { selectedObject } = useObjectProperties();
+
+  const defaultAccordionValue =
+    selectedObject && isTextObject(selectedObject) ? "text" : "size-position";
 
   return (
     <AnimatePresence>
@@ -45,19 +50,29 @@ export const PropertiesPanel: React.FC = () => {
 
           <div className="flex flex-col gap-2 px-3 overflow-y-scroll no-scrollbar pb-2">
             <div className="flex flex-col gap-2">
-              <Accordion type="single" collapsible defaultValue="size-position">
+              <Accordion type="single" collapsible defaultValue={defaultAccordionValue}>
+                {isTextObject(selectedObject) && (
+                  <AccordionItem value="text">
+                    <AccordionTrigger>Text Properties</AccordionTrigger>
+                    <AccordionContent>
+                      <TextSection />
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
                 <AccordionItem value="size-position">
                   <AccordionTrigger>Size & Position</AccordionTrigger>
                   <AccordionContent>
                     <SizeAndPositionSection />
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="style">
-                  <AccordionTrigger>Style</AccordionTrigger>
-                  <AccordionContent>
-                    <StyleSection />
-                  </AccordionContent>
-                </AccordionItem>
+                {!isTextObject(selectedObject) && (
+                  <AccordionItem value="style">
+                    <AccordionTrigger>Style</AccordionTrigger>
+                    <AccordionContent>
+                      <StyleSection />
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
               </Accordion>
             </div>
           </div>
