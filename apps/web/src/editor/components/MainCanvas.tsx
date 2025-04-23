@@ -10,7 +10,7 @@ import { ModifiedEvent, TPointerEvent } from "fabric";
 const MainCanvas = () => {
   const {
     data: {
-      canvas: { width, height },
+      canvas: { width, height, data: canvasData },
     },
   } = useEditorData();
 
@@ -37,8 +37,14 @@ const MainCanvas = () => {
         if (!canvas) throw new Error("Canvas not initialized");
 
         canvas.setDimensions({ width, height });
-        canvas.set({ backgroundColor: "#FFFFFF" });
+        if (canvasData) {
+          console.log("Canvas data found", canvasData);
+          await canvas.loadFromJSON(canvasData);
+        } else {
+          canvas.set({ backgroundColor: "#FFFFFF" });
+        }
         canvas.renderAll();
+        canvas.requestRenderAll();
 
         setCanvas(canvas);
         console.log("Canvas initialized");
