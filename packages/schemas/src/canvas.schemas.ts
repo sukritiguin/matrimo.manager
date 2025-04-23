@@ -15,9 +15,11 @@ const createCanvasSchema = z.object({
   canvasData: z.object({}).or(z.string()).optional(),
 });
 
+const canvasDataSchema = z.object({}).or(z.string());
+
 const updateCanvasSchema = createCanvasSchema.partial();
 
-export { canvasParamsSchema, createCanvasSchema, updateCanvasSchema };
+export { canvasParamsSchema, createCanvasSchema, updateCanvasSchema, canvasDataSchema };
 
 export type CreateCanvasSchema = z.infer<typeof createCanvasSchema>;
 export type UpdateCanvasSchema = z.infer<typeof updateCanvasSchema>;

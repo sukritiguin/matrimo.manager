@@ -9,5 +9,6 @@ router.use(authenticate);
 router.get("/:canvasId", CanvasController.get);
 router.post("/:canvasId", CanvasController.create);
 router.patch("/:canvasId", CanvasController.update);
+router.patch("/:canvasId/data", CanvasController.canvasDataUpdate);
 
 export default router;
