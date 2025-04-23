@@ -10,7 +10,8 @@ const UploadsPanel = () => {
   const { setPreviewImage } = useUploadStore();
   const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
 
-  const { handleClickToAddImage, handleClickToUpload, uploadHandler, uploads } = useUploads();
+  const { handleClickToAddImage, handleClickToUpload, uploadHandler, uploads, isUploadsLoading } =
+    useUploads();
 
   return (
     <React.Fragment>
@@ -35,59 +36,67 @@ const UploadsPanel = () => {
             </Button>
           </div>
 
-          {uploads.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4">
-              {uploads.map((upload, index) => (
-                <motion.div
-                  layoutId={`upload-${upload.image.url}`}
-                  key={upload.id}
-                  className="relative flex flex-col items-center justify-center border p-1 rounded-md"
-                  onMouseEnter={() => setHoverIndex(index)}
-                  onMouseLeave={() => setHoverIndex(null)}
-                >
-                  <AnimatePresence>
-                    {hoverIndex === index && (
-                      <motion.div
-                        className="absolute inset-0 p-1 rounded-md flex items-center justify-center bg-muted/50"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3, delay: 0.3 }}
-                      >
-                        {/* Add and Preview buttons */}
-                        <motion.div className="flex flex-col gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleClickToAddImage(upload.image.url)}
-                          >
-                            Add
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPreviewImage(upload)}
-                          >
-                            Preview
-                          </Button>
-                        </motion.div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  <div className="text-sm sr-only">{upload.image.fileName}</div>
-                  <motion.img
-                    layoutId={`img-${upload.imageId}`}
-                    src={upload.image.url}
-                    alt={upload.image.fileName}
-                    className="w-full h-auto"
-                    loading="lazy"
-                  />
-                </motion.div>
-              ))}
+          {isUploadsLoading ? (
+            <div className="flex items-center justify-center h-60 py-4 px-2 border border-dashed border-gray-300 rounded-md bg-gray-50">
+              <div className="text-gray-500 text-sm">Loading uploads...</div>
             </div>
           ) : (
-            <NoUploadsDisplay />
+            <React.Fragment>
+              {uploads.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4">
+                  {uploads.map((upload, index) => (
+                    <motion.div
+                      layoutId={`upload-${upload.image.url}`}
+                      key={upload.id}
+                      className="relative flex flex-col items-center justify-center border p-1 rounded-md"
+                      onMouseEnter={() => setHoverIndex(index)}
+                      onMouseLeave={() => setHoverIndex(null)}
+                    >
+                      <AnimatePresence>
+                        {hoverIndex === index && (
+                          <motion.div
+                            className="absolute inset-0 p-1 rounded-md flex items-center justify-center bg-muted/50"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3, delay: 0.3 }}
+                          >
+                            {/* Add and Preview buttons */}
+                            <motion.div className="flex flex-col gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleClickToAddImage(upload.image.url)}
+                              >
+                                Add
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPreviewImage(upload)}
+                              >
+                                Preview
+                              </Button>
+                            </motion.div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <div className="text-sm sr-only">{upload.image.fileName}</div>
+                      <motion.img
+                        layoutId={`img-${upload.imageId}`}
+                        src={upload.image.url}
+                        alt={upload.image.fileName}
+                        className="w-full h-auto"
+                        loading="lazy"
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <NoUploadsDisplay />
+              )}
+            </React.Fragment>
           )}
         </div>
       </PanelWrapper>

@@ -4,10 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addImageToCanvas } from "../fabric/fabric-utils";
 import { useEditorStore } from "../store/useEditorStore";
 import { useUploadStore } from "../store/useUploadStore";
+import { useSidebarStore } from "../store/useSidebarStore";
 
 export const useUploads = () => {
   const { canvas } = useEditorStore();
   const { setPreviewImage } = useUploadStore();
+  const { activeItem } = useSidebarStore();
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -64,9 +66,10 @@ export const useUploads = () => {
     }
   };
 
-  const { data } = useQuery({
+  const { data, isPending: isUploadsLoading } = useQuery({
     queryKey: ["events", "editor", "uploads"],
     queryFn: ({ queryKey }) => getUploads(),
+    enabled: activeItem === "uploads",
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
@@ -118,5 +121,6 @@ export const useUploads = () => {
     handleClickToAddImage,
     handleClickToDeleteImage,
     uploads: data?.uploads || [],
+    isUploadsLoading,
   };
 };
