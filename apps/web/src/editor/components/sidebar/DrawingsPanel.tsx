@@ -15,6 +15,7 @@ import { useEditorStore } from "@/editor/store/useEditorStore";
 import { Droplets, EraserIcon, Minus, Paintbrush, Palette, PencilIcon, Plus } from "lucide-react";
 import { useState } from "react";
 import { PanelWrapper } from "./PanelWrapper";
+import { ColorPalette } from "../common/ColorPalette";
 
 function DrawingPanel() {
   const { canvas } = useEditorStore();
@@ -106,48 +107,11 @@ function DrawingPanel() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="colors">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <Label>Color Palette</Label>
-                  <div
-                    className="w-6 h-6 rounded-full border shadow-sm"
-                    style={{ backgroundColor: drawingColor }}
-                  />
-                </div>
-                <div className="grid grid-cols-5 gap-2">
-                  {drawingPanelColorPresets.map((color) => (
-                    <div key={color}>
-                      <button
-                        className={`w-10 h-10 rounded-full border transition-transform
-                            hover:scale-110 ${
-                              color === drawingColor ? "ring-1 ring-offset-2 ring-primary" : ""
-                            }
-                            `}
-                        onClick={() => handleDrawingColorChange(color)}
-                        style={{ backgroundColor: color }}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex mt-5 space-x-2">
-                  <div className="relative">
-                    <Input
-                      type="color"
-                      value={drawingColor}
-                      onChange={(e) => handleDrawingColorChange(e.target.value)}
-                      className={"w-12 h-10 p-1 cursor-pointer"}
-                      disabled={isErasing}
-                    />
-                  </div>
-                  <Input
-                    type="text"
-                    value={drawingColor}
-                    onChange={(e) => handleDrawingColorChange(e.target.value)}
-                    className={"flex-1"}
-                    disabled={isErasing}
-                  />
-                </div>
-              </div>
+              <ColorPalette
+                color={drawingColor}
+                onChange={handleDrawingColorChange}
+                isDisabled={isErasing}
+              />
             </TabsContent>
             <TabsContent value="brush" className={"space-y-4"}>
               <div className="space-y-3">
