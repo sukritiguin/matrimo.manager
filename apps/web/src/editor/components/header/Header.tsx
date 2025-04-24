@@ -4,12 +4,15 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 import { useEditorStore } from "@/editor/store/useEditorStore";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Menu } from "./Menu";
 
 export const Header: React.FC = () => {
   return (
     <div className="fixed z-50 w-full top-12 h-12 border-b bg-background">
       <div className="flex w-full items-center justify-between gap-4 h-full px-6">
-        <div className="basis-1/3"></div>
+        <div className="basis-1/3 pl-10 flex">
+          <Menu />
+        </div>
         <EditorTitle />
         <div className="flex items-center justify-end gap-2 basis-1/3">
           <ZoomSection />
@@ -18,6 +21,8 @@ export const Header: React.FC = () => {
     </div>
   );
 };
+
+// const Menu
 
 const ZoomSection: React.FC = () => {
   const { canvas, zoom, setZoom } = useEditorStore();
