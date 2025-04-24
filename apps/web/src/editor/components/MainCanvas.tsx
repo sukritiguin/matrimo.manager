@@ -37,7 +37,7 @@ const MainCanvas = () => {
         if (!canvas) throw new Error("Canvas not initialized");
 
         canvas.setDimensions({ width, height });
-        if (canvasData) {
+        if (canvasData && canvasData !== "null") {
           console.log("Canvas data found", canvasData);
           await canvas.loadFromJSON(canvasData);
         } else {
