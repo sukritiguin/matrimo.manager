@@ -10,18 +10,33 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import { useEditorEvents } from "@/editor/hooks/useEditorEvents";
 import { useEditorStore } from "@/editor/store/useEditorStore";
 import { useRouter } from "@tanstack/react-router";
 
 export const Menu = () => {
+  const {
+    onCopyObject,
+    onCutObject,
+    onPasteObject,
+    onSave,
+    onRedo,
+    onUndo,
+    onZoomIn,
+    onZoomOut,
+    onZoomReset,
+  } = useEditorEvents();
+
   const { exportCanvas } = useEditorStore();
+
   const router = useRouter();
+
   return (
     <Menubar>
       <MenubarMenu>
         <MenubarTrigger className="px-4">File</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onSave}>
             Save
             <MenubarShortcut>Ctrl+S</MenubarShortcut>
           </MenubarItem>
@@ -42,20 +57,20 @@ export const Menu = () => {
       <MenubarMenu>
         <MenubarTrigger className="px-4">Edit</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onUndo}>
             Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onRedo}>
             Redo <MenubarShortcut>Ctrl+Y</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onCutObject}>
             Cut <MenubarShortcut>Ctrl+X</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onCopyObject}>
             Copy <MenubarShortcut>Ctrl+C</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onPasteObject}>
             Paste <MenubarShortcut>Ctrl+V</MenubarShortcut>
           </MenubarItem>
         </MenubarContent>
@@ -63,13 +78,13 @@ export const Menu = () => {
       <MenubarMenu>
         <MenubarTrigger className="px-4">View</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onZoomIn}>
             Zoom In <MenubarShortcut>Ctrl++</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onZoomOut}>
             Zoom Out <MenubarShortcut>Ctrl+-</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem onSelect={() => {}}>
+          <MenubarItem onSelect={onZoomReset}>
             Reset Zoom <MenubarShortcut>Ctrl+0</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />

@@ -10,6 +10,7 @@ import { useEditorStore } from "@/editor/store/useEditorStore";
 import { useSidebarStore } from "@/editor/store/useSidebarStore";
 import { useUploadStore } from "@/editor/store/useUploadStore";
 import { useObjectProperties } from "@/editor/store/usePropertiesStore";
+import { useCanvasHistoryStore } from "@/editor/store/useCanvasHistory";
 
 export const Route = createFileRoute("/editor/$editorId")({
   loader: ({ context, location, params }) => {
@@ -42,6 +43,7 @@ function EditorPage() {
   const editorSidebar = useSidebarStore();
   const uploadStore = useUploadStore();
   const propertiesStore = useObjectProperties();
+  const historyStore = useCanvasHistoryStore();
 
   useEffect(() => {
     return () => {
@@ -49,6 +51,7 @@ function EditorPage() {
       editorSidebar.reset();
       uploadStore.reset();
       propertiesStore.reset();
+      historyStore.reset();
     };
   }, []);
 

@@ -100,11 +100,6 @@ const MainCanvas = () => {
     };
   }, [canvas, setIsSelectedObjectMoving]);
 
-  useEffect(() => {
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onKeyDown]);
-
   // Selection customization
   useEffect(() => {
     if (!canvas) return;
