@@ -12,6 +12,11 @@ interface IEditorStore extends IEditorState {
   setZoom: (zoom: number) => void;
   setShowPropertiesPanel: (flag: boolean) => void;
   markAsModified: () => void;
+  exportCanvas: {
+    asImage: () => void;
+    asSvg: () => void;
+    asPdf: () => void;
+  };
   reset: () => void;
 }
 
@@ -40,6 +45,55 @@ export const useEditorStore = create<IEditorStore>((set, get) => ({
 
   markAsModified: () => {
     console.log("mark as modified");
+  },
+
+  exportCanvas: {
+    asImage: () => {
+      const { canvas } = get();
+      if (!canvas) return;
+      const dataUrl = canvas.toDataURL({
+        format: "png",
+        multiplier: 2,
+      });
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "canvas.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      canvas.discardActiveObject();
+    },
+    asSvg: () => {
+      const { canvas } = get();
+      if (!canvas) return;
+      const svgData = canvas.toSVG();
+      const blob = new Blob([svgData], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "canvas.svg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    },
+    asPdf: () => {
+      const { canvas } = get();
+      if (!canvas) return;
+      const pdfData = canvas.toDataURL({
+        format: "png",
+        multiplier: 2,
+      });
+      const blob = new Blob([pdfData], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "canvas.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    },
   },
 
   reset: () => set(initialState),
